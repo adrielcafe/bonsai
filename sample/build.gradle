@@ -1,0 +1,19 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+apply from: "../android-module.gradle"
+
+android {
+    defaultConfig {
+        applicationId "cafe.adriel.bonsai.sample"
+    }
+}
+
+dependencies {
+    implementation(project(":bonsai"))
+
+    implementation libs.compose.activity
+    implementation libs.compose.material
+}
