@@ -1,9 +1,11 @@
 [versions]
 plugin-android = "7.1.2"
 plugin-ktlint = "10.2.1"
+plugin-detekt = "1.20.0-RC1"
 plugin-maven = "0.18.0"
 
 kotlin = "1.6.10"
+okio = "3.0.0"
 
 compose = "1.1.1"
 composeActivity = "1.4.0"
@@ -12,13 +14,17 @@ composeMultiplatform = "1.1.1"
 [libraries]
 plugin-android = { module = "com.android.tools.build:gradle", version.ref = "plugin-android" }
 plugin-ktlint = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "plugin-ktlint" }
+plugin-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "plugin-detekt" }
 plugin-maven = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "plugin-maven" }
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-compose-multiplatform = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "composeMultiplatform" }
 
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "composeActivity" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
+compose-material-icons = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose" }
 
 [bundles]
-plugins = ["plugin-android", "plugin-ktlint", "plugin-maven", "plugin-kotlin", "plugin-compose-multiplatform"]
+plugins = ["plugin-android", "plugin-ktlint", "plugin-detekt", "plugin-maven", "plugin-kotlin", "plugin-compose-multiplatform"]
