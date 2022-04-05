@@ -12,7 +12,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 compileOnly(compose.runtime)
-                compileOnly(compose.material)
+                compileOnly(compose.foundation)
+                compileOnly(compose.ui)
             }
         }
     }
