@@ -5,6 +5,7 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
@@ -25,19 +26,34 @@ public data class FileSystemNodeStyle(
     val directoryCollapsedIcon: Painter?,
     val directoryExpandedIcon: Painter?,
     val textStyle: TextStyle
-)
+) {
+
+    public companion object {
+        public val DefaultStyle: FileSystemNodeStyle
+            @Composable
+            get() {
+                val fileIcon = rememberVectorPainter(Icons.Outlined.InsertDriveFile)
+                val directoryCollapsedIcon = rememberVectorPainter(Icons.Outlined.Folder)
+                val directoryExpandedIcon = rememberVectorPainter(Icons.Outlined.FolderOpen)
+
+                return remember {
+                    FileSystemNodeStyle(
+                        fileIcon = fileIcon,
+                        directoryCollapsedIcon = directoryCollapsedIcon,
+                        directoryExpandedIcon = directoryExpandedIcon,
+                        textStyle = BasicNodeStyle.DefaultTextStyle
+                    )
+                }
+            }
+    }
+}
 
 @Composable
 public fun fileSystemNodes(
     rootDirectory: Path,
     fileSystem: FileSystem = FileSystem.SYSTEM,
     selfInclude: Boolean = false,
-    style: FileSystemNodeStyle = FileSystemNodeStyle(
-        fileIcon = rememberVectorPainter(Icons.Outlined.InsertDriveFile),
-        directoryCollapsedIcon = rememberVectorPainter(Icons.Outlined.FolderOpen),
-        directoryExpandedIcon = rememberVectorPainter(Icons.Outlined.Folder),
-        textStyle = BasicNodeStyle.defaultTextStyle
-    )
+    style: FileSystemNodeStyle = FileSystemNodeStyle.DefaultStyle
 ): List<Node<Path>> =
     with(FileSystemNodeScope(fileSystem, style)) {
         fileSystemNodes(
@@ -81,7 +97,7 @@ private fun FileSystemNodeScope.directoryNode(
 ) = BasicBranchNode(
     content = directory,
     name = directory.name,
-    children = { child -> fileSystemNodes(child, this) },
+    children = { child -> fileSystemNodes(child) },
     style = BasicNodeStyle(
         collapsedIcon = style.directoryCollapsedIcon,
         expandedIcon = style.directoryExpandedIcon,

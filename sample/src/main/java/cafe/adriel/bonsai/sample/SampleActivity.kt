@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import cafe.adriel.bonsai.core.Tree
 import cafe.adriel.bonsai.core.TreeStyle
 import cafe.adriel.bonsai.filesystem.fileSystemNodes
-import okio.Path.Companion.toOkioPath
 
 class SampleActivity : ComponentActivity() {
 
@@ -28,7 +27,7 @@ class SampleActivity : ComponentActivity() {
                 Column {
                     Tree(
                         nodes = fileSystemNodes(
-                            rootDirectory = rootDirectory.toOkioPath(),
+                            rootDirectory = rootDirectory,
                             selfInclude = true
                         ),
                         style = TreeStyle(

@@ -52,11 +52,11 @@ public data class BasicNodeStyle(
     public val collapsedIcon: Painter? = null,
     public val expandedIcon: Painter? = collapsedIcon,
     public val nodeNameStartPadding: Dp = 4.dp,
-    public val textStyle: TextStyle = defaultTextStyle
+    public val textStyle: TextStyle = DefaultTextStyle
 ) {
 
     public companion object {
-        public val defaultTextStyle: TextStyle = TextStyle(
+        public val DefaultTextStyle: TextStyle = TextStyle(
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,
             letterSpacing = 0.1.sp
