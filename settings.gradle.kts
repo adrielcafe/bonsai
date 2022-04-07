@@ -3,13 +3,14 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 
 include(
+    ":sample",
     ":bonsai-core",
     ":bonsai-file-system",
-    ":sample",
 )
 
 enableFeaturePreview("VERSION_CATALOGS")

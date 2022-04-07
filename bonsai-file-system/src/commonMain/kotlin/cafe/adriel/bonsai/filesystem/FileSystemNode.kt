@@ -16,34 +16,30 @@ import cafe.adriel.bonsai.core.Node
 import okio.FileSystem
 import okio.Path
 
+public typealias FileSystemIcon = @Composable (Path) -> Painter?
+
 private data class FileSystemNodeScope(
     val fileSystem: FileSystem,
     val style: FileSystemNodeStyle
 )
 
 public data class FileSystemNodeStyle(
-    val fileIcon: Painter?,
-    val directoryCollapsedIcon: Painter?,
-    val directoryExpandedIcon: Painter?,
+    val fileIcon: FileSystemIcon,
+    val directoryCollapsedIcon: FileSystemIcon,
+    val directoryExpandedIcon: FileSystemIcon,
     val textStyle: TextStyle
 ) {
 
     public companion object {
         public val DefaultStyle: FileSystemNodeStyle
             @Composable
-            get() {
-                val fileIcon = rememberVectorPainter(Icons.Outlined.InsertDriveFile)
-                val directoryCollapsedIcon = rememberVectorPainter(Icons.Outlined.Folder)
-                val directoryExpandedIcon = rememberVectorPainter(Icons.Outlined.FolderOpen)
-
-                return remember {
-                    FileSystemNodeStyle(
-                        fileIcon = fileIcon,
-                        directoryCollapsedIcon = directoryCollapsedIcon,
-                        directoryExpandedIcon = directoryExpandedIcon,
-                        textStyle = BasicNodeStyle.DefaultTextStyle
-                    )
-                }
+            get() = remember {
+                FileSystemNodeStyle(
+                    fileIcon = { rememberVectorPainter(Icons.Outlined.InsertDriveFile) },
+                    directoryCollapsedIcon = { rememberVectorPainter(Icons.Outlined.Folder) },
+                    directoryExpandedIcon = { rememberVectorPainter(Icons.Outlined.FolderOpen) },
+                    textStyle = BasicNodeStyle.DefaultTextStyle
+                )
             }
     }
 }
@@ -62,6 +58,7 @@ public fun fileSystemNodes(
         )
     }
 
+@Composable
 private fun FileSystemNodeScope.fileSystemNodes(
     rootDirectory: Path,
     selfInclude: Boolean = false,
@@ -81,17 +78,19 @@ private fun FileSystemNodeScope.fileSystemNodes(
             .orEmpty()
     }
 
+@Composable
 private fun FileSystemNodeScope.fileNode(
     file: Path
 ) = BasicLeafNode(
     content = file,
     name = file.name,
     style = BasicNodeStyle(
-        collapsedIcon = style.fileIcon,
+        collapsedIcon = style.fileIcon(file),
         textStyle = style.textStyle
     )
 )
 
+@Composable
 private fun FileSystemNodeScope.directoryNode(
     directory: Path
 ) = BasicBranchNode(
@@ -99,8 +98,8 @@ private fun FileSystemNodeScope.directoryNode(
     name = directory.name,
     children = { child -> fileSystemNodes(child) },
     style = BasicNodeStyle(
-        collapsedIcon = style.directoryCollapsedIcon,
-        expandedIcon = style.directoryExpandedIcon,
+        collapsedIcon = style.directoryCollapsedIcon(directory),
+        expandedIcon = style.directoryExpandedIcon(directory),
         textStyle = style.textStyle
     )
 )
