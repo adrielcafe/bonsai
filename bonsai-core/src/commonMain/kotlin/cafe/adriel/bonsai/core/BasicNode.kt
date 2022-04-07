@@ -12,11 +12,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-public open class BasicLeafNode<T>(
-    override val content: T,
-    public val name: String = content.toString(),
-    public val style: BasicNodeStyle = BasicNodeStyle()
-) : LeafNode<T> {
+public interface BasicNode<T> : Node<T> {
+
+    public val name: String
+
+    public val style: BasicNodeStyle
 
     @Composable
     override fun NodeIcon(state: NodeState) {
@@ -28,25 +28,20 @@ public open class BasicLeafNode<T>(
         BasicNodeName(name, style)
     }
 }
+
+public open class BasicLeafNode<T>(
+    override val content: T,
+    override val name: String = content.toString(),
+    override val style: BasicNodeStyle = BasicNodeStyle()
+) : LeafNode<T>, BasicNode<T>
 
 public open class BasicBranchNode<T>(
     override val content: T,
-    public val name: String = content.toString(),
-    public val style: BasicNodeStyle = BasicNodeStyle(),
+    override val name: String = content.toString(),
+    override val style: BasicNodeStyle = BasicNodeStyle(),
     override val startExpanded: Boolean = false,
     override val children: ChildrenNodes<T>,
-) : BranchNode<T> {
-
-    @Composable
-    override fun NodeIcon(state: NodeState) {
-        BasicNodeIcon(name, state, style)
-    }
-
-    @Composable
-    override fun NodeName(state: NodeState) {
-        BasicNodeName(name, style)
-    }
-}
+) : BranchNode<T>, BasicNode<T>
 
 public data class BasicNodeStyle(
     public val collapsedIcon: Painter? = null,
@@ -70,11 +65,7 @@ private fun BasicNodeIcon(
     state: NodeState,
     style: BasicNodeStyle
 ) {
-    val icon = if (state.isExpanded) {
-        style.expandedIcon ?: style.collapsedIcon
-    } else {
-        style.collapsedIcon ?: style.expandedIcon
-    }
+    val icon = if (state.isExpanded) style.expandedIcon else style.collapsedIcon
 
     if (icon != null) {
         Image(
