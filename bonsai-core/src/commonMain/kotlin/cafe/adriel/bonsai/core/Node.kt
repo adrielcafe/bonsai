@@ -6,11 +6,12 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,19 +57,19 @@ public data class NodeState(
 internal fun <T> TreeScope<T>.Node(
     node: Node<T>
 ) {
-    val (isExpanded, setExpanded) = rememberSaveable {
-        mutableStateOf(
-            if (node is BranchNode) node.startExpanded
-            else false
-        )
+    var isExpanded by rememberSaveable {
+        mutableStateOf(node is BranchNode && node.startExpanded)
     }
-    val state = remember(level, isExpanded) { NodeState(level, isExpanded) }
+    val state = remember(level, isExpanded) {
+        NodeState(level, isExpanded)
+    }
+    val toggleExpansion = { isExpanded = isExpanded.not() }
 
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ToggleIcon(node, state, isExpanded, setExpanded)
-        NodeContent(node, state, isExpanded, setExpanded)
+        ToggleIcon(node, state, isExpanded, toggleExpansion)
+        NodeContent(node, state, toggleExpansion)
     }
 
     if (node is BranchNode) {
@@ -86,30 +88,25 @@ private fun <T> TreeScope<T>.ToggleIcon(
     node: Node<T>,
     state: NodeState,
     isExpanded: Boolean,
-    setExpanded: (Boolean) -> Unit,
+    toggleExpansion: () -> Unit,
 ) {
     if (style.toggleIcon == null) return
 
     if (node is BranchNode) {
-        val rotation by animateFloatAsState(
-            if (isExpanded && style.enableToggleIconRotation) 90f
-            else 0f
+        val rotationDegrees by animateFloatAsState(
+            if (isExpanded && style.enableToggleIconRotation) 90f else 0f
         )
 
-        Box(
-            contentAlignment = Alignment.Center,
+        Image(
+            painter = style.toggleIcon,
+            contentDescription = "Toggle",
             modifier = Modifier
                 .clip(style.toggleShape)
-                .then(clickableNode(node, state, isExpanded, setExpanded, true))
+                .then(clickableNode(node, state, toggleExpansion, forceSingleClick = true))
                 .size(style.nodeIconSize)
                 .requiredSize(style.toggleIconSize)
-                .rotate(rotation)
-        ) {
-            Image(
-                painter = style.toggleIcon,
-                contentDescription = "Toggle"
-            )
-        }
+                .rotate(rotationDegrees)
+        )
     } else {
         Spacer(Modifier.size(style.nodeIconSize))
     }
@@ -119,22 +116,17 @@ private fun <T> TreeScope<T>.ToggleIcon(
 private fun <T> TreeScope<T>.NodeContent(
     node: Node<T>,
     state: NodeState,
-    isExpanded: Boolean,
-    setExpanded: (Boolean) -> Unit,
+    toggleExpansion: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clip(style.nodeShape)
-            .then(clickableNode(node, state, isExpanded, setExpanded))
+            .then(clickableNode(node, state, toggleExpansion))
             .padding(style.nodePadding)
+            .requiredHeight(style.nodeIconSize)
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.requiredSize(style.nodeIconSize)
-        ) {
-            node.NodeIcon(state)
-        }
+        node.NodeIcon(state)
         node.NodeName(state)
     }
 }
@@ -147,7 +139,9 @@ private fun <T> TreeScope<T>.ExpandedNode(
 
     with(nodeScope) {
         Column(
-            modifier = Modifier.padding(style.indentationPadding)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(style.innerLevelPadding)
         ) {
             nodes.forEach { node -> Node(node) }
         }
@@ -160,23 +154,19 @@ private fun <T> TreeScope<T>.ExpandedNode(
 private fun <T> TreeScope<T>.clickableNode(
     node: Node<T>,
     state: NodeState,
-    isExpanded: Boolean,
-    setExpanded: (Boolean) -> Unit,
+    toggleExpansion: () -> Unit,
     forceSingleClick: Boolean = false
-): Modifier {
-    val toggle = { setExpanded(isExpanded.not()) }
-
-    return if (forceSingleClick || onLongClick == null && onDoubleClick == null) {
+): Modifier =
+    if (forceSingleClick || onLongClick == null && onDoubleClick == null) {
         Modifier.clickable(
             role = Role.Button,
-            onClick = { if (onClick?.invoke(node, state) == true) toggle() }
+            onClick = { if (onClick?.invoke(node, state) == true) toggleExpansion() }
         )
     } else {
         Modifier.combinedClickable(
             role = Role.Button,
-            onClick = { if (onClick?.invoke(node, state) == true) toggle() },
-            onDoubleClick = { if (onDoubleClick?.invoke(node, state) == true) toggle() },
-            onLongClick = { if (onLongClick?.invoke(node, state) == true) toggle() }
+            onClick = { if (onClick?.invoke(node, state) == true) toggleExpansion() },
+            onDoubleClick = { if (onDoubleClick?.invoke(node, state) == true) toggleExpansion() },
+            onLongClick = { if (onLongClick?.invoke(node, state) == true) toggleExpansion() }
         )
     }
-}

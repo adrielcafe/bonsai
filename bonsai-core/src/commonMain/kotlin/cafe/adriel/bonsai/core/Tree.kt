@@ -42,13 +42,13 @@ public data class TreeStyle(
     public val nodeIconSize: Dp = 24.dp,
     public val nodePadding: PaddingValues = PaddingValues(all = 4.dp),
     public val nodeShape: Shape = RoundedCornerShape(size = 4.dp),
-    public val indentationPadding: PaddingValues = PaddingValues(start = nodeIconSize),
+    public val innerLevelPadding: PaddingValues = PaddingValues(start = nodeIconSize),
 )
 
 @Composable
 public fun <T> Tree(
     nodes: List<Node<T>>,
-    onClick: OnNodeClick<T>,
+    onClick: OnNodeClick<T>? = null,
     onLongClick: OnNodeClick<T>? = null,
     onDoubleClick: OnNodeClick<T>? = null,
     modifier: Modifier = Modifier,
