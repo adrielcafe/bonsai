@@ -1,74 +1,122 @@
 package cafe.adriel.bonsai.core
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-
-public typealias ToggleNode = Boolean
-public typealias OnNodeClick<T> = (Node<T>, NodeState) -> ToggleNode
-
-internal data class TreeScope<T>(
-    val level: Int,
-    val style: TreeStyle,
-    val onClick: OnNodeClick<T>?,
-    val onLongClick: OnNodeClick<T>?,
-    val onDoubleClick: OnNodeClick<T>?,
-)
-
-public data class TreeStyle(
-    public val expandTransition: EnterTransition = fadeIn() + expandVertically(),
-    public val collapseTransition: ExitTransition = fadeOut() + shrinkVertically(),
-    public val toggleIcon: Painter? = null,
-    public val toggleIconSize: Dp = 16.dp,
-    public val toggleShape: Shape = CircleShape,
-    public val enableToggleIconRotation: Boolean = true,
-    public val nodeIconSize: Dp = 24.dp,
-    public val nodePadding: PaddingValues = PaddingValues(all = 4.dp),
-    public val nodeShape: Shape = RoundedCornerShape(size = 4.dp),
-    public val innerLevelPadding: PaddingValues = PaddingValues(start = nodeIconSize),
-)
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 
 @Composable
-public fun <T> Tree(
-    nodes: List<Node<T>>,
-    onClick: OnNodeClick<T>? = null,
-    onLongClick: OnNodeClick<T>? = null,
-    onDoubleClick: OnNodeClick<T>? = null,
-    modifier: Modifier = Modifier,
-    style: TreeStyle = TreeStyle()
+public fun <T> rememberTree(
+    rootNodes: List<Node<T>>
+): Tree<T> =
+    rememberSaveable(saver = treeSaver()) {
+        Tree(rootNodes)
+    }
+
+private fun <T> treeSaver(): Saver<Tree<T>, Any> =
+    listSaver(
+        save = { tree -> tree.nodes },
+        restore = { nodes -> Tree(nodes) }
+    )
+
+public class Tree<T>(
+    private val rootNodes: List<Node<T>>
 ) {
-    with(
-        TreeScope(
-            level = 0,
-            style = style,
-            onClick = onClick,
-            onLongClick = onLongClick,
-            onDoubleClick = onDoubleClick,
-        )
-    ) {
-        LazyColumn(
-            modifier = modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-        ) {
-            items(nodes) { node -> Node(node) }
+
+    public val nodes: SnapshotStateList<Node<T>> =
+        mutableStateListOf(*rootNodes.toTypedArray())
+
+    public fun collapseAll() {
+        collapseDown(rootNodes, minDepth = Int.MAX_VALUE)
+    }
+
+    public fun expandAll() {
+        expandDown(rootNodes, maxDepth = Int.MAX_VALUE)
+    }
+
+    public fun collapseRoot() {
+        collapseDown(rootNodes, minDepth = 0)
+    }
+
+    public fun expandRoot() {
+        expandDown(rootNodes, maxDepth = 0)
+    }
+
+    public fun collapseFrom(minDepth: Int) {
+        collapseDown(rootNodes, minDepth)
+    }
+
+    public fun expandUntil(maxDepth: Int) {
+        expandDown(rootNodes, maxDepth)
+    }
+
+    public fun collapseNode(node: Node<T>) {
+        collapseDown(listOf(node), minDepth = 0)
+    }
+
+    public fun expandNode(node: Node<T>, maxDepth: Int = 0) {
+        expandUp(node.parent)
+        expandDown(listOf(node), maxDepth = maxDepth)
+    }
+
+    private tailrec fun collapseDown(nodes: List<Node<T>>, minDepth: Int) {
+        val children = nodes
+            .asSequence()
+            .filterIsInstance<BranchNode<T>>()
+            .onEach { if (it.level >= minDepth) it.isExpanded.value = false }
+            .flatMap { it.children }
+            .toList()
+
+        if (children.isNotEmpty()) {
+            collapseDown(children, minDepth)
         }
     }
+
+    private tailrec fun expandDown(nodes: List<Node<T>>, maxDepth: Int) {
+        val children = nodes
+            .asSequence()
+            .filterIsInstance<BranchNode<T>>()
+            .onEach { it.isExpanded.value = true }
+            .filter { it.level < maxDepth }
+            .flatMap { it.children }
+            .toList()
+
+        if (children.isNotEmpty()) {
+            expandDown(children, maxDepth)
+        }
+    }
+
+    private tailrec fun expandUp(node: Node<T>?) {
+        if (node is BranchNode) {
+            node.isExpanded.value = true
+            expandUp(node.parent)
+        }
+    }
+}
+
+public interface Node<T> {
+
+    public val content: T
+
+    public val level: Int
+
+    public val parent: Node<T>?
+
+    @Composable
+    public fun NodeIcon()
+
+    @Composable
+    public fun NodeName()
+}
+
+public interface LeafNode<T> : Node<T>
+
+public interface BranchNode<T> : Node<T> {
+
+    public var isExpanded: MutableState<Boolean>
+
+    public val children: SnapshotStateList<Node<T>>
 }

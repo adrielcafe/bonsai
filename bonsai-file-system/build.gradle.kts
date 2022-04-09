@@ -12,7 +12,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(projects.bonsaiCore)
-                api(libs.okio)
+                implementation(libs.okio)
                 compileOnly(compose.runtime)
                 compileOnly(compose.foundation)
                 compileOnly(compose.ui)

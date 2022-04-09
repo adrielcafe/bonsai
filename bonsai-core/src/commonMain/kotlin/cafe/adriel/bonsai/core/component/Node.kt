@@ -1,4 +1,4 @@
-package cafe.adriel.bonsai.core
+package cafe.adriel.bonsai.core.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -16,69 +16,40 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.Role
-
-public typealias ChildrenNodes<T> = @Composable (T) -> List<Node<T>>
-
-public interface Node<T> {
-
-    public val content: T
-
-    @Composable
-    public fun NodeIcon(state: NodeState)
-
-    @Composable
-    public fun NodeName(state: NodeState)
-}
-
-public interface LeafNode<T> : Node<T>
-
-public interface BranchNode<T> : Node<T> {
-
-    public val startExpanded: Boolean
-
-    public val children: ChildrenNodes<T>
-}
-
-public data class NodeState(
-    public val level: Int,
-    public val isExpanded: Boolean
-)
+import cafe.adriel.bonsai.core.BranchNode
+import cafe.adriel.bonsai.core.Node
 
 @Composable
 internal fun <T> TreeScope<T>.Node(
     node: Node<T>
 ) {
-    var isExpanded by rememberSaveable {
-        mutableStateOf(node is BranchNode && node.startExpanded)
+    val toggleExpansion = {
+        if (node is BranchNode) {
+            node.isExpanded.value = node.isExpanded.value.not()
+        }
     }
-    val state = remember(level, isExpanded) {
-        NodeState(level, isExpanded)
-    }
-    val toggleExpansion = { isExpanded = isExpanded.not() }
 
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ToggleIcon(node, state, isExpanded, toggleExpansion)
-        NodeContent(node, state, toggleExpansion)
+        ToggleIcon(node, toggleExpansion)
+        NodeContent(node, toggleExpansion)
     }
 
     if (node is BranchNode) {
         AnimatedVisibility(
-            visible = isExpanded,
+            visible = node.isExpanded.value,
             enter = style.expandTransition,
             exit = style.collapseTransition
         ) {
-            ExpandedNode(node.children(node.content))
+            ExpandedNode(node.children)
         }
     }
 }
@@ -86,15 +57,13 @@ internal fun <T> TreeScope<T>.Node(
 @Composable
 private fun <T> TreeScope<T>.ToggleIcon(
     node: Node<T>,
-    state: NodeState,
-    isExpanded: Boolean,
     toggleExpansion: () -> Unit,
 ) {
     if (style.toggleIcon == null) return
 
     if (node is BranchNode) {
         val rotationDegrees by animateFloatAsState(
-            if (isExpanded && style.enableToggleIconRotation) 90f else 0f
+            if (node.isExpanded.value && style.enableToggleIconRotation) 90f else 0f
         )
 
         Image(
@@ -102,7 +71,7 @@ private fun <T> TreeScope<T>.ToggleIcon(
             contentDescription = "Toggle",
             modifier = Modifier
                 .clip(style.toggleShape)
-                .then(clickableNode(node, state, toggleExpansion, forceSingleClick = true))
+                .then(clickableNode(node, toggleExpansion, forceSingleClick = true))
                 .size(style.nodeIconSize)
                 .requiredSize(style.toggleIconSize)
                 .rotate(rotationDegrees)
@@ -115,36 +84,31 @@ private fun <T> TreeScope<T>.ToggleIcon(
 @Composable
 private fun <T> TreeScope<T>.NodeContent(
     node: Node<T>,
-    state: NodeState,
     toggleExpansion: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clip(style.nodeShape)
-            .then(clickableNode(node, state, toggleExpansion))
+            .then(clickableNode(node, toggleExpansion))
             .padding(style.nodePadding)
             .requiredHeight(style.nodeIconSize)
     ) {
-        node.NodeIcon(state)
-        node.NodeName(state)
+        node.NodeIcon()
+        node.NodeName()
     }
 }
 
 @Composable
 private fun <T> TreeScope<T>.ExpandedNode(
-    nodes: List<Node<T>>
+    nodes: SnapshotStateList<Node<T>>
 ) {
-    val nodeScope = copy(level = level.inc())
-
-    with(nodeScope) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(style.innerLevelPadding)
-        ) {
-            nodes.forEach { node -> Node(node) }
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(style.innerLevelPadding)
+    ) {
+        nodes.forEach { node -> Node(node) }
     }
 }
 
@@ -153,20 +117,19 @@ private fun <T> TreeScope<T>.ExpandedNode(
 @Composable
 private fun <T> TreeScope<T>.clickableNode(
     node: Node<T>,
-    state: NodeState,
     toggleExpansion: () -> Unit,
     forceSingleClick: Boolean = false
 ): Modifier =
     if (forceSingleClick || onLongClick == null && onDoubleClick == null) {
         Modifier.clickable(
             role = Role.Button,
-            onClick = { if (onClick?.invoke(node, state) == true) toggleExpansion() }
+            onClick = { if (onClick?.invoke(node) == true) toggleExpansion() }
         )
     } else {
         Modifier.combinedClickable(
             role = Role.Button,
-            onClick = { if (onClick?.invoke(node, state) == true) toggleExpansion() },
-            onDoubleClick = { if (onDoubleClick?.invoke(node, state) == true) toggleExpansion() },
-            onLongClick = { if (onLongClick?.invoke(node, state) == true) toggleExpansion() }
+            onClick = { if (onClick?.invoke(node) == true) toggleExpansion() },
+            onDoubleClick = { if (onDoubleClick?.invoke(node) == true) toggleExpansion() },
+            onLongClick = { if (onLongClick?.invoke(node) == true) toggleExpansion() }
         )
     }

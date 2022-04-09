@@ -5,7 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.Adb
@@ -20,10 +23,14 @@ import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import cafe.adriel.bonsai.core.BranchNode
+import cafe.adriel.bonsai.core.Node
 import cafe.adriel.bonsai.core.Tree
-import cafe.adriel.bonsai.core.TreeStyle
+import cafe.adriel.bonsai.core.component.Tree
+import cafe.adriel.bonsai.core.component.TreeStyle
 import cafe.adriel.bonsai.filesystem.FileSystemNodeStyle
 import cafe.adriel.bonsai.filesystem.fileSystemNodes
 import okio.Path
@@ -35,13 +42,21 @@ class SampleActivity : ComponentActivity() {
         else codeCacheDir
     }
 
+    private val Tree<Path>.firstBranchNodeAtLevel1: Node<Path>
+        get() = nodes
+            .filterIsInstance<BranchNode<Path>>()
+            .first { it.children.isNotEmpty() }
+            .children
+            .filterIsInstance<BranchNode<Path>>()
+            .first { it.children.isNotEmpty() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                Column {
-                    Tree(
-                        nodes = fileSystemNodes(
+                val tree = remember {
+                    Tree<Path>(
+                        rootNodes = fileSystemNodes(
                             rootDirectory = rootDirectory,
                             selfInclude = true,
                             style = FileSystemNodeStyle.DefaultStyle.copy(
@@ -49,20 +64,50 @@ class SampleActivity : ComponentActivity() {
                                 directoryCollapsedIcon = { getIcon(path = it, default = Icons.Outlined.Folder) },
                                 directoryExpandedIcon = { getIcon(path = it, default = Icons.Outlined.FolderOpen) },
                             )
-                        ),
+                        )
+                    )
+                }
+
+                Column {
+                    Row {
+                        Button(onClick = { tree.collapseRoot() }) {
+                            Text(text = "Collapse Root")
+                        }
+                        Button(onClick = { tree.expandRoot() }) {
+                            Text(text = "Expand Root")
+                        }
+                    }
+                    Row {
+                        Button(onClick = { tree.collapseFrom(2) }) {
+                            Text(text = "Collapse Level 2")
+                        }
+                        Button(onClick = { tree.expandUntil(2) }) {
+                            Text(text = "Expand Level 2")
+                        }
+                    }
+                    Row {
+                        Button(onClick = { tree.collapseNode(tree.firstBranchNodeAtLevel1) }) {
+                            Text(text = "Collapse Node")
+                        }
+                        Button(onClick = { tree.expandNode(tree.firstBranchNodeAtLevel1) }) {
+                            Text(text = "Expand Node")
+                        }
+                    }
+                    Tree(
+                        tree = tree,
                         style = TreeStyle(
                             toggleIcon = rememberVectorPainter(Icons.Default.ChevronRight)
                         ),
-                        onClick = { node, state ->
-                            println("CLICK $state , ${node.content}")
+                        onClick = { node ->
+                            println("CLICK ${node.content}")
                             true
                         },
-                        onLongClick = { node, state ->
-                            println("LONG CLICK $state , ${node.content}")
+                        onLongClick = { node ->
+                            println("LONG CLICK ${node.content}")
                             false
                         },
-                        onDoubleClick = { node, state ->
-                            println("DOUBLE CLICK $state , ${node.content}")
+                        onDoubleClick = { node ->
+                            println("DOUBLE ${node.content}")
                             false
                         }
                     )

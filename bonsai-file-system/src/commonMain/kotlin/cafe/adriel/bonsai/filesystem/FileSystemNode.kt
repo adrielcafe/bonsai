@@ -5,14 +5,14 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
-import cafe.adriel.bonsai.core.BasicBranchNode
-import cafe.adriel.bonsai.core.BasicLeafNode
-import cafe.adriel.bonsai.core.BasicNodeStyle
 import cafe.adriel.bonsai.core.Node
+import cafe.adriel.bonsai.core.component.BasicBranchNode
+import cafe.adriel.bonsai.core.component.BasicLeafNode
+import cafe.adriel.bonsai.core.component.BasicNodeStyle
 import okio.FileSystem
 import okio.Path
 
@@ -31,20 +31,15 @@ public data class FileSystemNodeStyle(
 ) {
 
     public companion object {
-        public val DefaultStyle: FileSystemNodeStyle
-            @Composable
-            get() = remember {
-                FileSystemNodeStyle(
-                    fileIcon = { rememberVectorPainter(Icons.Outlined.InsertDriveFile) },
-                    directoryCollapsedIcon = { rememberVectorPainter(Icons.Outlined.Folder) },
-                    directoryExpandedIcon = { rememberVectorPainter(Icons.Outlined.FolderOpen) },
-                    textStyle = BasicNodeStyle.DefaultTextStyle
-                )
-            }
+        public val DefaultStyle: FileSystemNodeStyle = FileSystemNodeStyle(
+            fileIcon = { rememberVectorPainter(Icons.Outlined.InsertDriveFile) },
+            directoryCollapsedIcon = { rememberVectorPainter(Icons.Outlined.Folder) },
+            directoryExpandedIcon = { rememberVectorPainter(Icons.Outlined.FolderOpen) },
+            textStyle = BasicNodeStyle.DefaultTextStyle
+        )
     }
 }
 
-@Composable
 public fun fileSystemNodes(
     rootDirectory: Path,
     fileSystem: FileSystem = FileSystem.SYSTEM,
@@ -54,52 +49,63 @@ public fun fileSystemNodes(
     with(FileSystemNodeScope(fileSystem, style)) {
         fileSystemNodes(
             rootDirectory = rootDirectory,
+            level = 0,
+            parent = null,
             selfInclude = selfInclude,
         )
     }
 
-@Composable
 private fun FileSystemNodeScope.fileSystemNodes(
     rootDirectory: Path,
-    selfInclude: Boolean = false,
+    level: Int,
+    parent: Node<Path>?,
+    selfInclude: Boolean = false
 ): List<Node<Path>> =
     if (selfInclude) {
-        listOf(directoryNode(rootDirectory))
+        listOf(directoryNode(rootDirectory, level, parent))
     } else {
         fileSystem
             .listOrNull(rootDirectory)
             ?.map { path ->
                 if (FileSystem.SYSTEM.metadata(path).isDirectory) {
-                    directoryNode(path)
+                    directoryNode(path, level, parent)
                 } else {
-                    fileNode(path)
+                    fileNode(path, level, parent)
                 }
             }
             .orEmpty()
     }
 
-@Composable
 private fun FileSystemNodeScope.fileNode(
-    file: Path
+    file: Path,
+    level: Int,
+    parent: Node<Path>?
 ) = BasicLeafNode(
     content = file,
     name = file.name,
+    level = level,
+    parent = parent,
     style = BasicNodeStyle(
-        collapsedIcon = style.fileIcon(file),
+        collapsedIcon = { style.fileIcon(file) },
         textStyle = style.textStyle
     )
 )
 
-@Composable
 private fun FileSystemNodeScope.directoryNode(
-    directory: Path
+    directory: Path,
+    level: Int,
+    parent: Node<Path>?
 ) = BasicBranchNode(
     content = directory,
     name = directory.name,
-    children = { child -> fileSystemNodes(child) },
+    level = level,
+    parent = parent,
+    children = mutableStateListOf(),
     style = BasicNodeStyle(
-        collapsedIcon = style.directoryCollapsedIcon(directory),
-        expandedIcon = style.directoryExpandedIcon(directory),
+        collapsedIcon = { style.directoryCollapsedIcon(directory) },
+        expandedIcon = { style.directoryExpandedIcon(directory) },
         textStyle = style.textStyle
     )
-)
+).apply {
+    children.addAll(fileSystemNodes(directory, level.inc(), this))
+}
