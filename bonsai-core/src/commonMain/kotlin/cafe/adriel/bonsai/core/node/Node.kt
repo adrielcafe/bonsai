@@ -24,9 +24,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.Role
 import cafe.adriel.bonsai.core.BonsaiScope
-import java.io.Serializable
+import cafe.adriel.bonsai.core.util.Saveable
 
-public interface Node<T> : Serializable {
+public interface Node<T> : Saveable {
 
     public val content: T
 

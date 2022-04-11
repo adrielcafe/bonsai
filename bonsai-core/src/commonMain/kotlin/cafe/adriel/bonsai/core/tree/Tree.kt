@@ -15,18 +15,15 @@ public class Tree<T>(
 ) : ExpandableTree<T> by ExpandableTreeManager(nodes) {
 
     public constructor(nodes: List<Node<T>>) :
-        this(*nodes.toTypedArray())
-
-    public constructor(vararg nodes: Node<T>) :
-        this(mutableStateListOf(*nodes))
+        this(mutableStateListOf(*nodes.toTypedArray()))
 }
 
 @Composable
 public fun <T> rememberTree(
-    rootNodes: List<Node<T>>
+    nodes: List<Node<T>>
 ): Tree<T> =
     rememberSaveable(saver = treeSaver()) {
-        Tree(rootNodes)
+        Tree(nodes)
     }
 
 private fun <T> treeSaver(): Saver<Tree<T>, Any> =

@@ -56,7 +56,7 @@ class SampleActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 val tree = rememberTree<Path>(
-                    rootNodes = fileSystemNodes(
+                    nodes = fileSystemNodes(
                         rootDirectory = rootDirectory,
                         selfInclude = true,
                         style = FileSystemNodeStyle.DefaultStyle.copy(
