@@ -1,4 +1,4 @@
-package cafe.adriel.bonsai.core.component
+package cafe.adriel.bonsai.core
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -20,20 +20,20 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import cafe.adriel.bonsai.core.Node
-import cafe.adriel.bonsai.core.Tree
+import cafe.adriel.bonsai.core.node.Node
+import cafe.adriel.bonsai.core.tree.Tree
 
 public typealias ToggleNode = Boolean
 public typealias OnNodeClick<T> = (Node<T>) -> ToggleNode
 
-internal data class TreeScope<T>(
-    val style: TreeStyle,
-    val onClick: OnNodeClick<T>?,
-    val onLongClick: OnNodeClick<T>?,
-    val onDoubleClick: OnNodeClick<T>?,
+public data class BonsaiScope<T>(
+    val style: BonsaiStyle = BonsaiStyle(),
+    val onClick: OnNodeClick<T>? = null,
+    val onLongClick: OnNodeClick<T>? = null,
+    val onDoubleClick: OnNodeClick<T>? = null,
 )
 
-public data class TreeStyle(
+public data class BonsaiStyle(
     public val expandTransition: EnterTransition = fadeIn() + expandVertically(),
     public val collapseTransition: ExitTransition = fadeOut() + shrinkVertically(),
     public val toggleIcon: Painter? = null,
@@ -47,22 +47,12 @@ public data class TreeStyle(
 )
 
 @Composable
-public fun <T> Tree(
+public fun <T> Bonsai(
     tree: Tree<T>,
-    onClick: OnNodeClick<T>? = null,
-    onLongClick: OnNodeClick<T>? = null,
-    onDoubleClick: OnNodeClick<T>? = null,
     modifier: Modifier = Modifier,
-    style: TreeStyle = TreeStyle()
+    scope: BonsaiScope<T> = BonsaiScope()
 ) {
-    with(
-        TreeScope(
-            style = style,
-            onClick = onClick,
-            onLongClick = onLongClick,
-            onDoubleClick = onDoubleClick,
-        )
-    ) {
+    with(scope) {
         LazyColumn(
             modifier = modifier
                 .fillMaxWidth()

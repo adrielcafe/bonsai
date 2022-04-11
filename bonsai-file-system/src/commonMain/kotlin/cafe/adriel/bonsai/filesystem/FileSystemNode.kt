@@ -9,18 +9,18 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
-import cafe.adriel.bonsai.core.Node
-import cafe.adriel.bonsai.core.component.BasicBranchNode
-import cafe.adriel.bonsai.core.component.BasicLeafNode
-import cafe.adriel.bonsai.core.component.BasicNodeStyle
+import cafe.adriel.bonsai.core.node.BasicBranchNode
+import cafe.adriel.bonsai.core.node.BasicLeafNode
+import cafe.adriel.bonsai.core.node.BasicNodeStyle
+import cafe.adriel.bonsai.core.node.Node
 import okio.FileSystem
 import okio.Path
 
 public typealias FileSystemIcon = @Composable (Path) -> Painter?
 
-private data class FileSystemNodeScope(
-    val fileSystem: FileSystem,
-    val style: FileSystemNodeStyle
+public data class FileSystemNodeScope(
+    val fileSystem: FileSystem = FileSystem.SYSTEM,
+    val style: FileSystemNodeStyle = FileSystemNodeStyle.DefaultStyle
 )
 
 public data class FileSystemNodeStyle(
@@ -42,11 +42,10 @@ public data class FileSystemNodeStyle(
 
 public fun fileSystemNodes(
     rootDirectory: Path,
-    fileSystem: FileSystem = FileSystem.SYSTEM,
     selfInclude: Boolean = false,
-    style: FileSystemNodeStyle = FileSystemNodeStyle.DefaultStyle
+    scope: FileSystemNodeScope = FileSystemNodeScope()
 ): List<Node<Path>> =
-    with(FileSystemNodeScope(fileSystem, style)) {
+    with(scope) {
         fileSystemNodes(
             rootDirectory = rootDirectory,
             level = 0,
@@ -67,7 +66,7 @@ private fun FileSystemNodeScope.fileSystemNodes(
         fileSystem
             .listOrNull(rootDirectory)
             ?.map { path ->
-                if (FileSystem.SYSTEM.metadata(path).isDirectory) {
+                if (fileSystem.metadata(path).isDirectory) {
                     directoryNode(path, level, parent)
                 } else {
                     fileNode(path, level, parent)

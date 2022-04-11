@@ -1,4 +1,4 @@
-package cafe.adriel.bonsai.core.component
+package cafe.adriel.bonsai.core.node
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
@@ -14,9 +14,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.bonsai.core.BranchNode
-import cafe.adriel.bonsai.core.LeafNode
-import cafe.adriel.bonsai.core.Node
 
 public interface BasicNode<T> : Node<T> {
 

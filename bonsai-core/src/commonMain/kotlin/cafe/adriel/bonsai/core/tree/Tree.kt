@@ -1,26 +1,13 @@
-package cafe.adriel.bonsai.core
+package cafe.adriel.bonsai.core.tree
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
-
-@Composable
-public fun <T> rememberTree(
-    rootNodes: List<Node<T>>
-): Tree<T> =
-    rememberSaveable(saver = treeSaver()) {
-        Tree(rootNodes)
-    }
-
-private fun <T> treeSaver(): Saver<Tree<T>, Any> =
-    listSaver(
-        save = { tree -> tree.nodes },
-        restore = { nodes -> Tree(nodes) }
-    )
+import cafe.adriel.bonsai.core.node.BranchNode
+import cafe.adriel.bonsai.core.node.Node
 
 public class Tree<T>(
     private val rootNodes: List<Node<T>>
@@ -97,26 +84,16 @@ public class Tree<T>(
     }
 }
 
-public interface Node<T> {
+@Composable
+public fun <T> rememberTree(
+    rootNodes: List<Node<T>>
+): Tree<T> =
+    rememberSaveable(saver = treeSaver()) {
+        Tree(rootNodes)
+    }
 
-    public val content: T
-
-    public val level: Int
-
-    public val parent: Node<T>?
-
-    @Composable
-    public fun NodeIcon()
-
-    @Composable
-    public fun NodeName()
-}
-
-public interface LeafNode<T> : Node<T>
-
-public interface BranchNode<T> : Node<T> {
-
-    public var isExpanded: MutableState<Boolean>
-
-    public val children: SnapshotStateList<Node<T>>
-}
+private fun <T> treeSaver(): Saver<Tree<T>, Any> =
+    listSaver(
+        save = { tree -> tree.nodes },
+        restore = { nodes -> Tree(nodes) }
+    )

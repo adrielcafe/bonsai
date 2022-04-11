@@ -1,4 +1,4 @@
-package cafe.adriel.bonsai.core.component
+package cafe.adriel.bonsai.core.node
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -15,19 +15,43 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.Role
-import cafe.adriel.bonsai.core.BranchNode
-import cafe.adriel.bonsai.core.Node
+import cafe.adriel.bonsai.core.BonsaiScope
+import java.io.Serializable
+
+public interface Node<T> : Serializable {
+
+    public val content: T
+
+    public val level: Int
+
+    public val parent: Node<T>?
+
+    @Composable
+    public fun NodeIcon()
+
+    @Composable
+    public fun NodeName()
+}
+
+public interface BranchNode<T> : Node<T> {
+
+    public var isExpanded: MutableState<Boolean>
+
+    public val children: SnapshotStateList<Node<T>>
+}
+
+public interface LeafNode<T> : Node<T>
 
 @Composable
-internal fun <T> TreeScope<T>.Node(
+internal fun <T> BonsaiScope<T>.Node(
     node: Node<T>
 ) {
     val toggleExpansion = {
@@ -55,7 +79,7 @@ internal fun <T> TreeScope<T>.Node(
 }
 
 @Composable
-private fun <T> TreeScope<T>.ToggleIcon(
+private fun <T> BonsaiScope<T>.ToggleIcon(
     node: Node<T>,
     toggleExpansion: () -> Unit,
 ) {
@@ -82,7 +106,7 @@ private fun <T> TreeScope<T>.ToggleIcon(
 }
 
 @Composable
-private fun <T> TreeScope<T>.NodeContent(
+private fun <T> BonsaiScope<T>.NodeContent(
     node: Node<T>,
     toggleExpansion: () -> Unit,
 ) {
@@ -100,7 +124,7 @@ private fun <T> TreeScope<T>.NodeContent(
 }
 
 @Composable
-private fun <T> TreeScope<T>.ExpandedNode(
+private fun <T> BonsaiScope<T>.ExpandedNode(
     nodes: SnapshotStateList<Node<T>>
 ) {
     Column(
@@ -115,7 +139,7 @@ private fun <T> TreeScope<T>.ExpandedNode(
 // TODO use context receiver (aka coeffects) when stable
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun <T> TreeScope<T>.clickableNode(
+private fun <T> BonsaiScope<T>.clickableNode(
     node: Node<T>,
     toggleExpansion: () -> Unit,
     forceSingleClick: Boolean = false

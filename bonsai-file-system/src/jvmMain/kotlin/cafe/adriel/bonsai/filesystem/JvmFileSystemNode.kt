@@ -1,7 +1,6 @@
 package cafe.adriel.bonsai.filesystem
 
-import cafe.adriel.bonsai.core.Node
-import okio.FileSystem
+import cafe.adriel.bonsai.core.node.Node
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import java.io.File
@@ -14,9 +13,8 @@ public fun fileSystemNodes(
 ): List<Node<Path>> =
     fileSystemNodes(
         rootDirectory = rootDirectory.toOkioPath(),
-        fileSystem = FileSystem.SYSTEM,
         selfInclude = selfInclude,
-        style = style
+        scope = FileSystemNodeScope(style = style)
     )
 
 public fun fileSystemNodes(
@@ -26,7 +24,6 @@ public fun fileSystemNodes(
 ): List<Node<Path>> =
     fileSystemNodes(
         rootDirectory = rootDirectory.toOkioPath(),
-        fileSystem = FileSystem.SYSTEM,
         selfInclude = selfInclude,
-        style = style
+        scope = FileSystemNodeScope(style = style)
     )

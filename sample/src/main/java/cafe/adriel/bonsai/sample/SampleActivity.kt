@@ -23,14 +23,15 @@ import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import cafe.adriel.bonsai.core.BranchNode
-import cafe.adriel.bonsai.core.Node
-import cafe.adriel.bonsai.core.Tree
-import cafe.adriel.bonsai.core.component.Tree
-import cafe.adriel.bonsai.core.component.TreeStyle
+import cafe.adriel.bonsai.core.Bonsai
+import cafe.adriel.bonsai.core.BonsaiScope
+import cafe.adriel.bonsai.core.BonsaiStyle
+import cafe.adriel.bonsai.core.node.BranchNode
+import cafe.adriel.bonsai.core.node.Node
+import cafe.adriel.bonsai.core.tree.Tree
+import cafe.adriel.bonsai.core.tree.rememberTree
 import cafe.adriel.bonsai.filesystem.FileSystemNodeStyle
 import cafe.adriel.bonsai.filesystem.fileSystemNodes
 import okio.Path
@@ -54,19 +55,17 @@ class SampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                val tree = remember {
-                    Tree<Path>(
-                        rootNodes = fileSystemNodes(
-                            rootDirectory = rootDirectory,
-                            selfInclude = true,
-                            style = FileSystemNodeStyle.DefaultStyle.copy(
-                                fileIcon = { getIcon(path = it, default = Icons.Outlined.InsertDriveFile) },
-                                directoryCollapsedIcon = { getIcon(path = it, default = Icons.Outlined.Folder) },
-                                directoryExpandedIcon = { getIcon(path = it, default = Icons.Outlined.FolderOpen) },
-                            )
+                val tree = rememberTree<Path>(
+                    rootNodes = fileSystemNodes(
+                        rootDirectory = rootDirectory,
+                        selfInclude = true,
+                        style = FileSystemNodeStyle.DefaultStyle.copy(
+                            fileIcon = { getIcon(path = it, default = Icons.Outlined.InsertDriveFile) },
+                            directoryCollapsedIcon = { getIcon(path = it, default = Icons.Outlined.Folder) },
+                            directoryExpandedIcon = { getIcon(path = it, default = Icons.Outlined.FolderOpen) },
                         )
                     )
-                }
+                )
 
                 Column {
                     Row {
@@ -93,23 +92,25 @@ class SampleActivity : ComponentActivity() {
                             Text(text = "Expand Node")
                         }
                     }
-                    Tree(
+                    Bonsai(
                         tree = tree,
-                        style = TreeStyle(
-                            toggleIcon = rememberVectorPainter(Icons.Default.ChevronRight)
-                        ),
-                        onClick = { node ->
-                            println("CLICK ${node.content}")
-                            true
-                        },
-                        onLongClick = { node ->
-                            println("LONG CLICK ${node.content}")
-                            false
-                        },
-                        onDoubleClick = { node ->
-                            println("DOUBLE ${node.content}")
-                            false
-                        }
+                        scope = BonsaiScope(
+                            style = BonsaiStyle(
+                                toggleIcon = rememberVectorPainter(Icons.Default.ChevronRight)
+                            ),
+                            onClick = { node ->
+                                println("CLICK ${node.content}")
+                                true
+                            },
+                            onLongClick = { node ->
+                                println("LONG CLICK ${node.content}")
+                                false
+                            },
+                            onDoubleClick = { node ->
+                                println("DOUBLE ${node.content}")
+                                false
+                            }
+                        )
                     )
                 }
             }
