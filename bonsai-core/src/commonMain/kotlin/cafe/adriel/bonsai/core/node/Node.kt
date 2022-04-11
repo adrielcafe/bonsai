@@ -45,7 +45,7 @@ public interface BranchNode<T> : Node<T> {
 
     public var isExpanded: MutableState<Boolean>
 
-    public val children: SnapshotStateList<Node<T>>
+    public val children: MutableList<Node<T>>
 }
 
 public interface LeafNode<T> : Node<T>
@@ -125,7 +125,7 @@ private fun <T> BonsaiScope<T>.NodeContent(
 
 @Composable
 private fun <T> BonsaiScope<T>.ExpandedNode(
-    nodes: SnapshotStateList<Node<T>>
+    nodes: List<Node<T>>
 ) {
     Column(
         modifier = Modifier

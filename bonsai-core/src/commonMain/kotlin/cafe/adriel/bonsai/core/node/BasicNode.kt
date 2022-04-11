@@ -46,7 +46,7 @@ public open class BasicBranchNode<T>(
     override val level: Int,
     override val parent: Node<T>?,
     override val style: BasicNodeStyle = BasicNodeStyle(),
-    override val children: SnapshotStateList<Node<T>>,
+    override val children: MutableList<Node<T>>,
     override var isExpanded: MutableState<Boolean> = mutableStateOf(false),
 ) : BranchNode<T>, BasicNode<T>
 
