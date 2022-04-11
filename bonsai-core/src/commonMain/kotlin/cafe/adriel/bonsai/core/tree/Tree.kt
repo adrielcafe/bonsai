@@ -6,82 +6,19 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import cafe.adriel.bonsai.core.node.BranchNode
 import cafe.adriel.bonsai.core.node.Node
+import cafe.adriel.bonsai.core.tree.expandable.ExpandableTree
+import cafe.adriel.bonsai.core.tree.expandable.ExpandableTreeManager
 
 public class Tree<T>(
-    private val rootNodes: List<Node<T>>
-) {
+    public val nodes: SnapshotStateList<Node<T>>
+) : ExpandableTree<T> by ExpandableTreeManager(nodes) {
 
-    public val nodes: SnapshotStateList<Node<T>> =
-        mutableStateListOf(*rootNodes.toTypedArray())
+    public constructor(nodes: List<Node<T>>) :
+        this(*nodes.toTypedArray())
 
-    public fun collapseAll() {
-        collapseDown(rootNodes, minDepth = Int.MAX_VALUE)
-    }
-
-    public fun expandAll() {
-        expandDown(rootNodes, maxDepth = Int.MAX_VALUE)
-    }
-
-    public fun collapseRoot() {
-        collapseDown(rootNodes, minDepth = 0)
-    }
-
-    public fun expandRoot() {
-        expandDown(rootNodes, maxDepth = 0)
-    }
-
-    public fun collapseFrom(minDepth: Int) {
-        collapseDown(rootNodes, minDepth)
-    }
-
-    public fun expandUntil(maxDepth: Int) {
-        expandDown(rootNodes, maxDepth)
-    }
-
-    public fun collapseNode(node: Node<T>) {
-        collapseDown(listOf(node), minDepth = 0)
-    }
-
-    public fun expandNode(node: Node<T>, maxDepth: Int = 0) {
-        expandUp(node.parent)
-        expandDown(listOf(node), maxDepth = maxDepth)
-    }
-
-    private tailrec fun collapseDown(nodes: List<Node<T>>, minDepth: Int) {
-        val children = nodes
-            .asSequence()
-            .filterIsInstance<BranchNode<T>>()
-            .onEach { if (it.level >= minDepth) it.isExpanded.value = false }
-            .flatMap { it.children }
-            .toList()
-
-        if (children.isNotEmpty()) {
-            collapseDown(children, minDepth)
-        }
-    }
-
-    private tailrec fun expandDown(nodes: List<Node<T>>, maxDepth: Int) {
-        val children = nodes
-            .asSequence()
-            .filterIsInstance<BranchNode<T>>()
-            .onEach { it.isExpanded.value = true }
-            .filter { it.level < maxDepth }
-            .flatMap { it.children }
-            .toList()
-
-        if (children.isNotEmpty()) {
-            expandDown(children, maxDepth)
-        }
-    }
-
-    private tailrec fun expandUp(node: Node<T>?) {
-        if (node is BranchNode) {
-            node.isExpanded.value = true
-            expandUp(node.parent)
-        }
-    }
+    public constructor(vararg nodes: Node<T>) :
+        this(mutableStateListOf(*nodes))
 }
 
 @Composable
