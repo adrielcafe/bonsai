@@ -18,9 +18,9 @@ import okio.Path
 
 public typealias FileSystemIcon = @Composable (Path) -> Painter?
 
-public data class FileSystemNodeScope(
-    val fileSystem: FileSystem = FileSystem.SYSTEM,
-    val style: FileSystemNodeStyle = FileSystemNodeStyle.DefaultStyle
+internal data class FileSystemNodeScope(
+    val fileSystem: FileSystem,
+    val style: FileSystemNodeStyle
 )
 
 public data class FileSystemNodeStyle(
@@ -43,9 +43,15 @@ public data class FileSystemNodeStyle(
 public fun fileSystemNodes(
     rootDirectory: Path,
     selfInclude: Boolean = false,
-    scope: FileSystemNodeScope = FileSystemNodeScope()
+    fileSystem: FileSystem = FileSystem.SYSTEM,
+    style: FileSystemNodeStyle = FileSystemNodeStyle.DefaultStyle
 ): List<Node<Path>> =
-    with(scope) {
+    with(
+        FileSystemNodeScope(
+            fileSystem = fileSystem,
+            style = style
+        )
+    ) {
         fileSystemNodes(
             rootDirectory = rootDirectory,
             level = 0,

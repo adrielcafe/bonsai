@@ -4,6 +4,8 @@ import cafe.adriel.bonsai.core.node.Node
 
 public interface ExpandableTree<T> {
 
+    public fun toggleExpansion(node: Node<T>)
+
     public fun collapseAll()
 
     public fun expandAll()

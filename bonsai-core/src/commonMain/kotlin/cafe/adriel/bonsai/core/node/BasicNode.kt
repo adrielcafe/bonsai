@@ -6,7 +6,6 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.TextStyle
@@ -37,7 +36,8 @@ public open class BasicLeafNode<T>(
     override val name: String = content.toString(),
     override val level: Int,
     override val parent: Node<T>?,
-    override val style: BasicNodeStyle = BasicNodeStyle()
+    override val style: BasicNodeStyle = BasicNodeStyle(),
+    override var isSelected: MutableState<Boolean> = mutableStateOf(false)
 ) : LeafNode<T>, BasicNode<T>
 
 public open class BasicBranchNode<T>(
@@ -48,6 +48,7 @@ public open class BasicBranchNode<T>(
     override val style: BasicNodeStyle = BasicNodeStyle(),
     override val children: MutableList<Node<T>>,
     override var isExpanded: MutableState<Boolean> = mutableStateOf(false),
+    override var isSelected: MutableState<Boolean> = mutableStateOf(false)
 ) : BranchNode<T>, BasicNode<T>
 
 public data class BasicNodeStyle(

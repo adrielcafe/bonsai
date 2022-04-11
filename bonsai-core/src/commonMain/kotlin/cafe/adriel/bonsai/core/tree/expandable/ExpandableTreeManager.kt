@@ -1,12 +1,16 @@
 package cafe.adriel.bonsai.core.tree.expandable
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import cafe.adriel.bonsai.core.node.BranchNode
 import cafe.adriel.bonsai.core.node.Node
 
 public class ExpandableTreeManager<T>(
     private val nodes: List<Node<T>>
 ) : ExpandableTree<T> {
+
+    override fun toggleExpansion(node: Node<T>) {
+        if (node is BranchNode && node.isExpanded.value) collapseNode(node)
+        else expandNode(node)
+    }
 
     override fun collapseAll() {
         collapseDown(nodes, minLevel = Int.MAX_VALUE)

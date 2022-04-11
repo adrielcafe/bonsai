@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import cafe.adriel.bonsai.core.Bonsai
-import cafe.adriel.bonsai.core.BonsaiScope
 import cafe.adriel.bonsai.core.BonsaiStyle
 import cafe.adriel.bonsai.core.node.BranchNode
 import cafe.adriel.bonsai.core.node.Node
@@ -94,22 +93,8 @@ class SampleActivity : ComponentActivity() {
                     }
                     Bonsai(
                         tree = tree,
-                        scope = BonsaiScope(
-                            style = BonsaiStyle(
-                                toggleIcon = rememberVectorPainter(Icons.Default.ChevronRight)
-                            ),
-                            onClick = { node ->
-                                println("CLICK ${node.content}")
-                                true
-                            },
-                            onLongClick = { node ->
-                                println("LONG CLICK ${node.content}")
-                                false
-                            },
-                            onDoubleClick = { node ->
-                                println("DOUBLE ${node.content}")
-                                false
-                            }
+                        style = BonsaiStyle(
+                            toggleIcon = rememberVectorPainter(Icons.Default.ChevronRight)
                         )
                     )
                 }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
@@ -23,14 +24,13 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.bonsai.core.node.Node
 import cafe.adriel.bonsai.core.tree.Tree
 
-public typealias ToggleNode = Boolean
-public typealias OnNodeClick<T> = (Node<T>) -> ToggleNode
+public typealias OnNodeClick<T> = ((Node<T>) -> Unit)?
 
-public data class BonsaiScope<T>(
-    val style: BonsaiStyle = BonsaiStyle(),
-    val onClick: OnNodeClick<T>? = null,
-    val onLongClick: OnNodeClick<T>? = null,
-    val onDoubleClick: OnNodeClick<T>? = null,
+internal data class BonsaiScope<T>(
+    val style: BonsaiStyle,
+    val onClick: OnNodeClick<T>,
+    val onLongClick: OnNodeClick<T>,
+    val onDoubleClick: OnNodeClick<T>,
 )
 
 public data class BonsaiStyle(
@@ -43,16 +43,26 @@ public data class BonsaiStyle(
     public val nodeIconSize: Dp = 24.dp,
     public val nodePadding: PaddingValues = PaddingValues(all = 4.dp),
     public val nodeShape: Shape = RoundedCornerShape(size = 4.dp),
-    public val innerLevelPadding: PaddingValues = PaddingValues(start = nodeIconSize),
+    public val nodeSelectedBackgroundColor: Color = Color.LightGray.copy(alpha = .7f)
 )
 
 @Composable
 public fun <T> Bonsai(
     tree: Tree<T>,
     modifier: Modifier = Modifier,
-    scope: BonsaiScope<T> = BonsaiScope()
+    onClick: OnNodeClick<T> = tree::toggleExpansion,
+    onLongClick: OnNodeClick<T> = tree::toggleSelection,
+    onDoubleClick: OnNodeClick<T> = tree::toggleExpansion,
+    style: BonsaiStyle = BonsaiStyle(),
 ) {
-    with(scope) {
+    with(
+        BonsaiScope(
+            onClick = onClick,
+            onLongClick = onLongClick,
+            onDoubleClick = onDoubleClick,
+            style = style,
+        )
+    ) {
         LazyColumn(
             modifier = modifier
                 .fillMaxWidth()

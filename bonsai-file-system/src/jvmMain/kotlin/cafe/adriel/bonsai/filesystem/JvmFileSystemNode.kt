@@ -14,7 +14,7 @@ public fun fileSystemNodes(
     fileSystemNodes(
         rootDirectory = rootDirectory.toOkioPath(),
         selfInclude = selfInclude,
-        scope = FileSystemNodeScope(style = style)
+        style = style
     )
 
 public fun fileSystemNodes(
@@ -25,5 +25,5 @@ public fun fileSystemNodes(
     fileSystemNodes(
         rootDirectory = rootDirectory.toOkioPath(),
         selfInclude = selfInclude,
-        scope = FileSystemNodeScope(style = style)
+        style = style
     )
