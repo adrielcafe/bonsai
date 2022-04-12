@@ -4,8 +4,11 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -22,8 +25,11 @@ import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import cafe.adriel.bonsai.core.Bonsai
 import cafe.adriel.bonsai.core.node.BranchNode
 import cafe.adriel.bonsai.core.node.Node
@@ -59,31 +65,10 @@ class SampleActivity : ComponentActivity() {
                     )
                 )
 
-                Column {
-                    Row {
-                        Button(onClick = { tree.collapseRoot() }) {
-                            Text(text = "Collapse Root")
-                        }
-                        Button(onClick = { tree.expandRoot() }) {
-                            Text(text = "Expand Root")
-                        }
-                    }
-                    Row {
-                        Button(onClick = { tree.collapseFrom(2) }) {
-                            Text(text = "Collapse Level 2")
-                        }
-                        Button(onClick = { tree.expandUntil(2) }) {
-                            Text(text = "Expand Level 2")
-                        }
-                    }
-                    Row {
-                        Button(onClick = { tree.collapseNode(tree.firstBranchNodeAtLevel1) }) {
-                            Text(text = "Collapse Node")
-                        }
-                        Button(onClick = { tree.expandNode(tree.firstBranchNodeAtLevel1) }) {
-                            Text(text = "Expand Node")
-                        }
-                    }
+                Column(
+                    verticalArrangement = Arrangement.Bottom,
+                    modifier = Modifier.fillMaxSize()
+                ) {
                     Bonsai(
                         tree = tree,
                         style = FileSystemBonsaiStyle().copy(
@@ -97,7 +82,13 @@ class SampleActivity : ComponentActivity() {
                             nodeExpandedIcon = { node ->
                                 getIcon(path = node.content, default = Icons.Outlined.FolderOpen)
                             }
-                        )
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(bottom = 4.dp)
+                    )
+                    TreeController(
+                        tree = tree
                     )
                 }
             }
@@ -105,16 +96,97 @@ class SampleActivity : ComponentActivity() {
     }
 
     @Composable
+    private fun TreeController(
+        tree: Tree<Path>
+    ) {
+        Column {
+            TreeManagerTitle("Expand")
+            LazyRow {
+                item {
+                    TreeManagerButton(
+                        text = "Root",
+                        onClick = { tree.expandRoot() }
+                    )
+                    TreeManagerButton(
+                        text = "Level 2",
+                        onClick = { tree.expandUntil(2) }
+                    )
+                    TreeManagerButton(
+                        text = "Node",
+                        onClick = { tree.expandNode(tree.firstBranchNodeAtLevel1) }
+                    )
+                }
+            }
+            TreeManagerTitle("Collapse")
+            LazyRow {
+                item {
+                    TreeManagerButton(
+                        text = "Root",
+                        onClick = { tree.collapseRoot() }
+                    )
+                    TreeManagerButton(
+                        text = "Level 2",
+                        onClick = { tree.collapseFrom(2) }
+                    )
+                    TreeManagerButton(
+                        text = "Node",
+                        onClick = { tree.collapseNode(tree.firstBranchNodeAtLevel1) }
+                    )
+                }
+            }
+            TreeManagerTitle("Select")
+            LazyRow {
+                item {
+                    TreeManagerButton(
+                        text = "Clear",
+                        onClick = { tree.clearSelection() }
+                    )
+                    TreeManagerButton(
+                        text = "Toggle",
+                        onClick = { tree.toggleSelection(tree.nodes.first()) }
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun TreeManagerTitle(
+        text: String
+    ) {
+        Text(
+            text = text,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        )
+    }
+
+    @Composable
+    private fun TreeManagerButton(
+        text: String,
+        onClick: () -> Unit
+    ) {
+        Button(
+            onClick = onClick,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        ) {
+            Text(text = text)
+        }
+    }
+
+    @Composable
     private fun getIcon(path: Path, default: ImageVector) =
-        when (path.toFile().extension) {
-            "apk" -> Icons.Outlined.Android
-            "jar" -> Icons.Outlined.LocalCafe
-            "studio" -> Icons.Outlined.Adb
-            "so" -> Icons.Outlined.Memory
-            "xml" -> Icons.Outlined.Description
-            "png", "webp", "jpg" -> Icons.Outlined.Image
-            "mp4", "webm", "gif" -> Icons.Outlined.Videocam
-            "wav", "mp3", "ogg" -> Icons.Outlined.Mic
-            else -> default
-        }.let { rememberVectorPainter(it) }
+        rememberVectorPainter(
+            when (path.toFile().extension) {
+                "apk" -> Icons.Outlined.Android
+                "jar" -> Icons.Outlined.LocalCafe
+                "studio" -> Icons.Outlined.Adb
+                "so" -> Icons.Outlined.Memory
+                "xml" -> Icons.Outlined.Description
+                "png", "webp", "jpg" -> Icons.Outlined.Image
+                "mp4", "webm", "gif" -> Icons.Outlined.Videocam
+                "wav", "mp3", "ogg" -> Icons.Outlined.Mic
+                else -> default
+            }
+        )
 }
