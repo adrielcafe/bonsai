@@ -43,21 +43,16 @@ public interface BranchNode<T> : Node<T> {
     }
 }
 
-public fun <T> BranchNode(
-    content: T,
-    name: String = content.toString(),
-    level: Int = 0,
-    parent: Node<T>? = null,
+public class SimpleBranchNode<T>(
+    override val content: T,
+    children: (BranchNode<T>) -> List<Node<T>>,
+    override val name: String = content.toString(),
+    override val parent: Node<T>? = null,
     isSelected: Boolean = false,
     isExpanded: Boolean = false,
-    children: MutableList<Node<T>> = mutableListOf()
-): BranchNode<T> =
-    object : BranchNode<T> {
-        override val content: T = content
-        override val name: String = name
-        override val level: Int = level
-        override val parent: Node<T>? = parent
-        override var isSelected: Boolean by mutableStateOf(isSelected)
-        override var isExpanded: Boolean by mutableStateOf(isExpanded)
-        override val children: MutableList<Node<T>> = children.toMutableStateList()
-    }
+) : BranchNode<T> {
+    override val level: Int = parent?.level?.inc() ?: 0
+    override var isSelected: Boolean by mutableStateOf(isSelected)
+    override var isExpanded: Boolean by mutableStateOf(isExpanded)
+    override val children: MutableList<Node<T>> by lazy { children(this).toMutableStateList() }
+}

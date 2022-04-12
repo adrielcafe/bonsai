@@ -29,11 +29,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.bonsai.core.node.Node
 import cafe.adriel.bonsai.core.tree.Tree
+import cafe.adriel.bonsai.core.tree.expandable.ExpandableTree
+import cafe.adriel.bonsai.core.tree.selectable.SelectableTree
 
 public typealias OnNodeClick<T> = ((Node<T>) -> Unit)?
 public typealias NodeIcon<T> = @Composable (Node<T>) -> Painter?
 
 public data class BonsaiScope<T>(
+    val expandableManager: ExpandableTree<T>,
+    val selectableManager: SelectableTree<T>,
     val style: BonsaiStyle<T>,
     val onClick: OnNodeClick<T>,
     val onLongClick: OnNodeClick<T>,
@@ -77,6 +81,8 @@ public fun <T> Bonsai(
 ) {
     with(
         BonsaiScope(
+            expandableManager = tree,
+            selectableManager = tree,
             onClick = onClick,
             onLongClick = onLongClick,
             onDoubleClick = onDoubleClick,

@@ -34,17 +34,12 @@ public interface LeafNode<T> : Node<T> {
     }
 }
 
-public fun <T> LeafNode(
-    content: T,
-    name: String = content.toString(),
-    level: Int = 0,
-    parent: Node<T>? = null,
+public class SimpleLeafNode<T>(
+    override val content: T,
+    override val name: String = content.toString(),
+    override val parent: Node<T>? = null,
     isSelected: Boolean = false
-): LeafNode<T> =
-    object : LeafNode<T> {
-        override val content: T = content
-        override val name: String = name
-        override val level: Int = level
-        override val parent: Node<T>? = parent
-        override var isSelected: Boolean by mutableStateOf(isSelected)
-    }
+) : LeafNode<T> {
+    override val level: Int = parent?.level?.inc() ?: 0
+    override var isSelected: Boolean by mutableStateOf(isSelected)
+}

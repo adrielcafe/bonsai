@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import cafe.adriel.bonsai.core.BonsaiScope
@@ -86,7 +85,7 @@ private fun <T> BonsaiScope<T>.ToggleIcon(
             contentDescription = "Toggle",
             modifier = Modifier
                 .clip(style.toggleShape)
-                .then(clickableNode(node, forceSingleClick = true))
+                .clickable { expandableManager.toggleExpansion(node) }
                 .size(style.nodeIconSize)
                 .requiredSize(style.toggleIconSize)
                 .rotate(rotationDegrees)
@@ -134,17 +133,12 @@ private fun <T> BonsaiScope<T>.ExpandedNode(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun <T> BonsaiScope<T>.clickableNode(
-    node: Node<T>,
-    forceSingleClick: Boolean = false
+    node: Node<T>
 ): Modifier =
-    if (forceSingleClick || onLongClick == null && onDoubleClick == null) {
-        Modifier.clickable(
-            role = Role.Button,
-            onClick = { onClick?.invoke(node) }
-        )
+    if (onLongClick == null && onDoubleClick == null) {
+        Modifier.clickable { onClick?.invoke(node) }
     } else {
         Modifier.combinedClickable(
-            role = Role.Button,
             onClick = { onClick?.invoke(node) },
             onDoubleClick = { onDoubleClick?.invoke(node) },
             onLongClick = { onLongClick?.invoke(node) }

@@ -3,7 +3,7 @@ package cafe.adriel.bonsai.core.tree.selectable
 import androidx.compose.runtime.mutableStateListOf
 import cafe.adriel.bonsai.core.node.Node
 
-public class SelectableTreeManager<T> : SelectableTree<T> {
+internal class SelectableTreeManager<T> : SelectableTree<T> {
 
     override val selectedNodes: MutableList<Node<T>> = mutableStateListOf()
 

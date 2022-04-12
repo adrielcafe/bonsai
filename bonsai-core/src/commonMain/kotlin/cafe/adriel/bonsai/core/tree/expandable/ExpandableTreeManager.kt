@@ -3,7 +3,7 @@ package cafe.adriel.bonsai.core.tree.expandable
 import cafe.adriel.bonsai.core.node.BranchNode
 import cafe.adriel.bonsai.core.node.Node
 
-public class ExpandableTreeManager<T>(
+internal class ExpandableTreeManager<T>(
     private val nodes: List<Node<T>>
 ) : ExpandableTree<T> {
 

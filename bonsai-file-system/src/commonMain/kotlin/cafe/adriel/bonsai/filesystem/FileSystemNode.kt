@@ -4,12 +4,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.InsertDriveFile
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import cafe.adriel.bonsai.core.BonsaiStyle
 import cafe.adriel.bonsai.core.node.BranchNode
-import cafe.adriel.bonsai.core.node.LeafNode
 import cafe.adriel.bonsai.core.node.Node
+import cafe.adriel.bonsai.core.node.SimpleBranchNode
+import cafe.adriel.bonsai.core.node.SimpleLeafNode
 import okio.FileSystem
 import okio.Path
 
@@ -42,7 +42,6 @@ public fun fileSystemNodes(
     ) {
         fileSystemNodes(
             rootDirectory = rootDirectory,
-            level = 0,
             parent = null,
             selfInclude = selfInclude,
         )
@@ -50,20 +49,19 @@ public fun fileSystemNodes(
 
 private fun FileSystemNodeScope.fileSystemNodes(
     rootDirectory: Path,
-    level: Int,
     parent: Node<Path>?,
     selfInclude: Boolean = false
 ): List<Node<Path>> =
     if (selfInclude) {
-        listOf(DirectoryNode(rootDirectory, level, parent))
+        listOf(DirectoryNode(rootDirectory, parent))
     } else {
         fileSystem
             .listOrNull(rootDirectory)
             ?.map { path ->
                 if (fileSystem.metadata(path).isDirectory) {
-                    DirectoryNode(path, level, parent)
+                    DirectoryNode(path, parent)
                 } else {
-                    FileNode(path, level, parent)
+                    FileNode(path, parent)
                 }
             }
             .orEmpty()
@@ -71,25 +69,19 @@ private fun FileSystemNodeScope.fileSystemNodes(
 
 private fun FileSystemNodeScope.FileNode(
     file: Path,
-    level: Int,
     parent: Node<Path>?
-) = LeafNode(
+) = SimpleLeafNode(
     content = file,
     name = file.name,
-    level = level,
     parent = parent
 )
 
 private fun FileSystemNodeScope.DirectoryNode(
     directory: Path,
-    level: Int,
     parent: Node<Path>?
-) = BranchNode(
+) = SimpleBranchNode(
     content = directory,
     name = directory.name,
-    level = level,
     parent = parent,
-    children = mutableStateListOf()
-).apply {
-    children.addAll(fileSystemNodes(directory, level.inc(), this))
-}
+    children = { node -> fileSystemNodes(directory, node) }
+)
