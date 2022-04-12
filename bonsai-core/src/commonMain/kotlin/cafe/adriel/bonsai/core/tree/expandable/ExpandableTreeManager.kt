@@ -8,7 +8,7 @@ public class ExpandableTreeManager<T>(
 ) : ExpandableTree<T> {
 
     override fun toggleExpansion(node: Node<T>) {
-        if (node is BranchNode && node.isExpanded.value) collapseNode(node)
+        if (node is BranchNode && node.isExpanded) collapseNode(node)
         else expandNode(node)
     }
 
@@ -49,7 +49,7 @@ public class ExpandableTreeManager<T>(
         val children = nodes
             .asSequence()
             .filterIsInstance<BranchNode<T>>()
-            .onEach { if (it.level >= minLevel) it.isExpanded.value = false }
+            .onEach { if (it.level >= minLevel) it.isExpanded = false }
             .flatMap { it.children }
             .toList()
 
@@ -62,7 +62,7 @@ public class ExpandableTreeManager<T>(
         val children = nodes
             .asSequence()
             .filterIsInstance<BranchNode<T>>()
-            .onEach { it.isExpanded.value = true }
+            .onEach { it.isExpanded = true }
             .filter { it.level < maxLevel }
             .flatMap { it.children }
             .toList()
@@ -74,7 +74,7 @@ public class ExpandableTreeManager<T>(
 
     private tailrec fun expandUp(node: Node<T>?) {
         if (node is BranchNode) {
-            node.isExpanded.value = true
+            node.isExpanded = true
             expandUp(node.parent)
         }
     }

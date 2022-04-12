@@ -8,23 +8,23 @@ public class SelectableTreeManager<T> : SelectableTree<T> {
     override val selectedNodes: MutableList<Node<T>> = mutableStateListOf()
 
     override fun toggleSelection(node: Node<T>) {
-        if (node.isSelected.value) unselectNode(node)
+        if (node.isSelected) unselectNode(node)
         else selectNode(node)
     }
 
     override fun selectNode(node: Node<T>) {
         selectedNodes += node
-        node.isSelected.value = true
+        node.isSelected = true
     }
 
     override fun unselectNode(node: Node<T>) {
         selectedNodes -= node
-        node.isSelected.value = false
+        node.isSelected = false
     }
 
     override fun clearSelection() {
         selectedNodes
-            .onEach { it.isSelected.value = false }
+            .onEach { it.isSelected = false }
             .clear()
     }
 }

@@ -14,37 +14,57 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.bonsai.core.node.Node
 import cafe.adriel.bonsai.core.tree.Tree
 
 public typealias OnNodeClick<T> = ((Node<T>) -> Unit)?
+public typealias NodeIcon<T> = @Composable (Node<T>) -> Painter?
 
-internal data class BonsaiScope<T>(
-    val style: BonsaiStyle,
+public data class BonsaiScope<T>(
+    val style: BonsaiStyle<T>,
     val onClick: OnNodeClick<T>,
     val onLongClick: OnNodeClick<T>,
     val onDoubleClick: OnNodeClick<T>,
 )
 
-public data class BonsaiStyle(
+public data class BonsaiStyle<T>(
     public val expandTransition: EnterTransition = fadeIn() + expandVertically(),
     public val collapseTransition: ExitTransition = fadeOut() + shrinkVertically(),
-    public val toggleIcon: Painter? = null,
+    public val toggleIcon: NodeIcon<T> = { rememberVectorPainter(Icons.Default.ChevronRight) },
     public val toggleIconSize: Dp = 16.dp,
     public val toggleShape: Shape = CircleShape,
     public val enableToggleIconRotation: Boolean = true,
     public val nodeIconSize: Dp = 24.dp,
     public val nodePadding: PaddingValues = PaddingValues(all = 4.dp),
     public val nodeShape: Shape = RoundedCornerShape(size = 4.dp),
-    public val nodeSelectedBackgroundColor: Color = Color.LightGray.copy(alpha = .7f)
-)
+    public val nodeSelectedBackgroundColor: Color = Color.LightGray.copy(alpha = .8f),
+    public val nodeCollapsedIcon: NodeIcon<T> = { null },
+    public val nodeExpandedIcon: NodeIcon<T> = nodeCollapsedIcon,
+    public val nodeNameStartPadding: Dp = 4.dp,
+    public val nodeNameTextStyle: TextStyle = DefaultNodeTextStyle
+) {
+
+    public companion object {
+        public val DefaultNodeTextStyle: TextStyle = TextStyle(
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            letterSpacing = 0.1.sp
+        )
+    }
+}
 
 @Composable
 public fun <T> Bonsai(
@@ -53,7 +73,7 @@ public fun <T> Bonsai(
     onClick: OnNodeClick<T> = tree::onNodeClick,
     onDoubleClick: OnNodeClick<T> = tree::onNodeClick,
     onLongClick: OnNodeClick<T> = tree::toggleSelection,
-    style: BonsaiStyle = BonsaiStyle(),
+    style: BonsaiStyle<T> = BonsaiStyle(),
 ) {
     with(
         BonsaiScope(

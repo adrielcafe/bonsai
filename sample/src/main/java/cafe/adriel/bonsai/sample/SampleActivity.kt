@@ -10,7 +10,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.Adb
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.Description
@@ -26,12 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import cafe.adriel.bonsai.core.Bonsai
-import cafe.adriel.bonsai.core.BonsaiStyle
 import cafe.adriel.bonsai.core.node.BranchNode
 import cafe.adriel.bonsai.core.node.Node
 import cafe.adriel.bonsai.core.tree.Tree
 import cafe.adriel.bonsai.core.tree.rememberTree
-import cafe.adriel.bonsai.filesystem.FileSystemNodeStyle
+import cafe.adriel.bonsai.filesystem.FileSystemBonsaiStyle
 import cafe.adriel.bonsai.filesystem.fileSystemNodes
 import okio.Path
 
@@ -57,12 +55,7 @@ class SampleActivity : ComponentActivity() {
                 val tree = rememberTree<Path>(
                     nodes = fileSystemNodes(
                         rootDirectory = rootDirectory,
-                        selfInclude = true,
-                        style = FileSystemNodeStyle.DefaultStyle.copy(
-                            fileIcon = { getIcon(path = it, default = Icons.Outlined.InsertDriveFile) },
-                            directoryCollapsedIcon = { getIcon(path = it, default = Icons.Outlined.Folder) },
-                            directoryExpandedIcon = { getIcon(path = it, default = Icons.Outlined.FolderOpen) },
-                        )
+                        selfInclude = true
                     )
                 )
 
@@ -93,8 +86,17 @@ class SampleActivity : ComponentActivity() {
                     }
                     Bonsai(
                         tree = tree,
-                        style = BonsaiStyle(
-                            toggleIcon = rememberVectorPainter(Icons.Default.ChevronRight)
+                        style = FileSystemBonsaiStyle().copy(
+                            nodeCollapsedIcon = { node ->
+                                getIcon(
+                                    path = node.content,
+                                    default = if (node is BranchNode) Icons.Outlined.Folder
+                                    else Icons.Outlined.InsertDriveFile
+                                )
+                            },
+                            nodeExpandedIcon = { node ->
+                                getIcon(path = node.content, default = Icons.Outlined.FolderOpen)
+                            }
                         )
                     )
                 }

@@ -16,8 +16,8 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,27 +32,20 @@ public interface Node<T> : Saveable {
 
     public val content: T
 
+    public val name: String
+
     public val level: Int
 
     public val parent: Node<T>?
 
-    public var isSelected: MutableState<Boolean>
+    public var isSelected: Boolean
 
     @Composable
-    public fun NodeIcon()
+    public fun BonsaiScope<T>.NodeIcon()
 
     @Composable
-    public fun NodeName()
+    public fun BonsaiScope<T>.NodeName()
 }
-
-public interface BranchNode<T> : Node<T> {
-
-    public var isExpanded: MutableState<Boolean>
-
-    public val children: MutableList<Node<T>>
-}
-
-public interface LeafNode<T> : Node<T>
 
 @Composable
 internal fun <T> BonsaiScope<T>.Node(
@@ -68,14 +61,11 @@ internal fun <T> BonsaiScope<T>.Node(
 
     if (node is BranchNode) {
         AnimatedVisibility(
-            visible = node.isExpanded.value,
+            visible = node.isExpanded,
             enter = style.expandTransition,
             exit = style.collapseTransition
         ) {
-            ExpandedNode(
-                nodes = node.children,
-                level = node.level
-            )
+            ExpandedNode(node.children)
         }
     }
 }
@@ -84,15 +74,15 @@ internal fun <T> BonsaiScope<T>.Node(
 private fun <T> BonsaiScope<T>.ToggleIcon(
     node: Node<T>
 ) {
-    if (style.toggleIcon == null) return
+    val toggleIcon = style.toggleIcon(node) ?: return
 
     if (node is BranchNode) {
         val rotationDegrees by animateFloatAsState(
-            if (node.isExpanded.value && style.enableToggleIconRotation) 90f else 0f
+            if (node.isExpanded && style.enableToggleIconRotation) 90f else 0f
         )
 
         Image(
-            painter = style.toggleIcon,
+            painter = toggleIcon,
             contentDescription = "Toggle",
             modifier = Modifier
                 .clip(style.toggleShape)
@@ -114,27 +104,28 @@ private fun <T> BonsaiScope<T>.NodeContent(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .run {
-                if (node.isSelected.value.not()) clip(style.nodeShape)
+                if (node.isSelected.not()) clip(style.nodeShape)
                 else background(style.nodeSelectedBackgroundColor, style.nodeShape)
             }
             .then(clickableNode(node))
             .padding(style.nodePadding)
             .requiredHeight(style.nodeIconSize)
     ) {
-        node.NodeIcon()
-        node.NodeName()
+        with(node) {
+            NodeIcon()
+            NodeName()
+        }
     }
 }
 
 @Composable
 private fun <T> BonsaiScope<T>.ExpandedNode(
-    nodes: List<Node<T>>,
-    level: Int
+    nodes: List<Node<T>>
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = level * style.nodeIconSize)
+            .padding(start = style.nodeIconSize)
     ) {
         nodes.forEach { node -> Node(node) }
     }

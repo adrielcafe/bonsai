@@ -8,22 +8,18 @@ import java.nio.file.Path as NioPath
 
 public fun fileSystemNodes(
     rootDirectory: File,
-    selfInclude: Boolean = false,
-    style: FileSystemNodeStyle = FileSystemNodeStyle.DefaultStyle
+    selfInclude: Boolean = false
 ): List<Node<Path>> =
     fileSystemNodes(
         rootDirectory = rootDirectory.toOkioPath(),
-        selfInclude = selfInclude,
-        style = style
+        selfInclude = selfInclude
     )
 
 public fun fileSystemNodes(
     rootDirectory: NioPath,
-    selfInclude: Boolean = false,
-    style: FileSystemNodeStyle = FileSystemNodeStyle.DefaultStyle
+    selfInclude: Boolean = false
 ): List<Node<Path>> =
     fileSystemNodes(
         rootDirectory = rootDirectory.toOkioPath(),
-        selfInclude = selfInclude,
-        style = style
+        selfInclude = selfInclude
     )
