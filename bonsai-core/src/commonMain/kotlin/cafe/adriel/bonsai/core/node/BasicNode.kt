@@ -53,7 +53,7 @@ public open class BasicBranchNode<T>(
 
 public data class BasicNodeStyle(
     public val collapsedIcon: @Composable () -> Painter? = { null },
-    public val expandedIcon: @Composable () -> Painter? = { null },
+    public val expandedIcon: @Composable () -> Painter? = collapsedIcon,
     public val nodeNameStartPadding: Dp = 4.dp,
     public val textStyle: TextStyle = DefaultTextStyle
 ) {

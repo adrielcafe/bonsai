@@ -50,9 +50,9 @@ public data class BonsaiStyle(
 public fun <T> Bonsai(
     tree: Tree<T>,
     modifier: Modifier = Modifier,
-    onClick: OnNodeClick<T> = tree::toggleExpansion,
+    onClick: OnNodeClick<T> = tree::onNodeClick,
+    onDoubleClick: OnNodeClick<T> = tree::onNodeClick,
     onLongClick: OnNodeClick<T> = tree::toggleSelection,
-    onDoubleClick: OnNodeClick<T> = tree::toggleExpansion,
     style: BonsaiStyle = BonsaiStyle(),
 ) {
     with(
@@ -71,4 +71,9 @@ public fun <T> Bonsai(
             items(tree.nodes) { node -> Node(node) }
         }
     }
+}
+
+private fun <T> Tree<T>.onNodeClick(node: Node<T>) {
+    clearSelection()
+    toggleExpansion(node)
 }

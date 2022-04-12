@@ -4,7 +4,7 @@ import cafe.adriel.bonsai.core.node.Node
 
 public interface SelectableTree<T> {
 
-    public val selectedNodes: MutableList<Node<T>>
+    public val selectedNodes: List<Node<T>>
 
     public fun toggleSelection(node: Node<T>)
 
