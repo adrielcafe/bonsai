@@ -29,7 +29,7 @@ public class NodeBuilder<T> internal constructor(
     public fun Branch(
         content: T,
         name: String = content.toString(),
-        children: NodeBuilder<T>.() -> Unit
+        children: NodeBuilder<T>.() -> Unit = {}
     ) {
         nodes += SimpleBranchNode(
             content = content,

@@ -19,16 +19,17 @@ public interface BranchNode<T> : Node<T> {
 
     @Composable
     override fun BonsaiScope<T>.NodeIcon() {
-        val icon = if (isExpanded) {
-            style.nodeExpandedIcon(this@BranchNode)
+        val (icon, colorFilter) = if (isExpanded) {
+            style.nodeExpandedIcon(this@BranchNode) to style.nodeExpandedColorFilter
         } else {
-            style.nodeCollapsedIcon(this@BranchNode)
+            style.nodeCollapsedIcon(this@BranchNode) to style.nodeCollapsedColorFilter
         }
 
         if (icon != null) {
             Image(
                 painter = icon,
-                contentDescription = name
+                contentDescription = name,
+                colorFilter = colorFilter,
             )
         }
     }

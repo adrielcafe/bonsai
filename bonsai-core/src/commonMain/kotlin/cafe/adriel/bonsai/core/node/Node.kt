@@ -83,6 +83,7 @@ private fun <T> BonsaiScope<T>.ToggleIcon(
         Image(
             painter = toggleIcon,
             contentDescription = "Toggle",
+            colorFilter = style.toggleIconColorFilter,
             modifier = Modifier
                 .clip(style.toggleShape)
                 .clickable { expandableManager.toggleExpansion(node) }

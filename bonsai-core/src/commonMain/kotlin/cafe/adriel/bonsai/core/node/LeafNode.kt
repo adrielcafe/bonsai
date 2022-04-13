@@ -19,7 +19,8 @@ public interface LeafNode<T> : Node<T> {
         if (icon != null) {
             Image(
                 painter = icon,
-                contentDescription = name
+                contentDescription = name,
+                colorFilter = style.nodeCollapsedColorFilter,
             )
         }
     }

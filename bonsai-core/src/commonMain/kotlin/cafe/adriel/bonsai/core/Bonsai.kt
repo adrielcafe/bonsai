@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -49,6 +50,7 @@ public data class BonsaiStyle<T>(
     public val collapseTransition: ExitTransition = fadeOut() + shrinkVertically(),
     public val toggleIcon: NodeIcon<T> = { rememberVectorPainter(Icons.Default.ChevronRight) },
     public val toggleIconSize: Dp = 16.dp,
+    public val toggleIconColorFilter: ColorFilter? = null,
     public val toggleShape: Shape = CircleShape,
     public val enableToggleIconRotation: Boolean = true,
     public val nodeIconSize: Dp = 24.dp,
@@ -56,7 +58,9 @@ public data class BonsaiStyle<T>(
     public val nodeShape: Shape = RoundedCornerShape(size = 4.dp),
     public val nodeSelectedBackgroundColor: Color = Color.LightGray.copy(alpha = .8f),
     public val nodeCollapsedIcon: NodeIcon<T> = { null },
+    public val nodeCollapsedColorFilter: ColorFilter? = null,
     public val nodeExpandedIcon: NodeIcon<T> = nodeCollapsedIcon,
+    public val nodeExpandedColorFilter: ColorFilter? = nodeCollapsedColorFilter,
     public val nodeNameStartPadding: Dp = 4.dp,
     public val nodeNameTextStyle: TextStyle = DefaultNodeTextStyle
 ) {
