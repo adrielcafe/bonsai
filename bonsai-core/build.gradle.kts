@@ -11,7 +11,6 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(libs.okio)
                 compileOnly(compose.runtime)
                 compileOnly(compose.foundation)
                 compileOnly(compose.ui)
