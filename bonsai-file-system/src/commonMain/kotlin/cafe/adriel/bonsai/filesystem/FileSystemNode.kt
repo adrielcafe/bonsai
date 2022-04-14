@@ -31,7 +31,7 @@ public fun FileSystemBonsaiStyle(): BonsaiStyle<Path> =
     )
 
 public fun fileSystemNodes(
-    rootDirectory: Path,
+    rootPath: Path,
     selfInclude: Boolean = false,
     fileSystem: FileSystem = FileSystem.SYSTEM
 ): List<Node<Path>> =
@@ -41,47 +41,41 @@ public fun fileSystemNodes(
         )
     ) {
         fileSystemNodes(
-            rootDirectory = rootDirectory,
+            rootPath = rootPath,
             parent = null,
             selfInclude = selfInclude,
         )
     }
 
 private fun FileSystemNodeScope.fileSystemNodes(
-    rootDirectory: Path,
+    rootPath: Path,
     parent: Node<Path>?,
     selfInclude: Boolean = false
 ): List<Node<Path>> =
     if (selfInclude) {
-        listOf(DirectoryNode(rootDirectory, parent))
+        listOf(FileSystemNode(rootPath, parent))
     } else {
         fileSystem
-            .listOrNull(rootDirectory)
-            ?.map { path ->
-                if (fileSystem.metadata(path).isDirectory) {
-                    DirectoryNode(path, parent)
-                } else {
-                    FileNode(path, parent)
-                }
-            }
+            .listOrNull(rootPath)
+            ?.map { path -> FileSystemNode(path, parent) }
             .orEmpty()
     }
 
-private fun FileSystemNodeScope.FileNode(
-    file: Path,
+private fun FileSystemNodeScope.FileSystemNode(
+    path: Path,
     parent: Node<Path>?
-) = SimpleLeafNode(
-    content = file,
-    name = file.name,
-    parent = parent
-)
-
-private fun FileSystemNodeScope.DirectoryNode(
-    directory: Path,
-    parent: Node<Path>?
-) = SimpleBranchNode(
-    content = directory,
-    name = directory.name,
-    parent = parent,
-    children = { node -> fileSystemNodes(directory, node) }
-)
+) =
+    if (fileSystem.metadata(path).isDirectory) {
+        SimpleBranchNode(
+            content = path,
+            name = path.name,
+            parent = parent,
+            children = { node -> fileSystemNodes(path, node) }
+        )
+    } else {
+        SimpleLeafNode(
+            content = path,
+            name = path.name,
+            parent = parent
+        )
+    }

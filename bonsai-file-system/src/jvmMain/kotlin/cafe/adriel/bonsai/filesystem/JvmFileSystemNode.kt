@@ -7,19 +7,19 @@ import java.io.File
 import java.nio.file.Path as NioPath
 
 public fun fileSystemNodes(
-    rootDirectory: File,
+    rootPath: File,
     selfInclude: Boolean = false
 ): List<Node<Path>> =
     fileSystemNodes(
-        rootDirectory = rootDirectory.toOkioPath(),
+        rootPath = rootPath.toOkioPath(),
         selfInclude = selfInclude
     )
 
 public fun fileSystemNodes(
-    rootDirectory: NioPath,
+    rootPath: NioPath,
     selfInclude: Boolean = false
 ): List<Node<Path>> =
     fileSystemNodes(
-        rootDirectory = rootDirectory.toOkioPath(),
+        rootPath = rootPath.toOkioPath(),
         selfInclude = selfInclude
     )

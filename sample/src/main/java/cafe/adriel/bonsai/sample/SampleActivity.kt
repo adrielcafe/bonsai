@@ -60,7 +60,7 @@ class SampleActivity : ComponentActivity() {
             MaterialTheme {
                 val tree = rememberTree<Path>(
                     nodes = fileSystemNodes(
-                        rootDirectory = rootDirectory,
+                        rootPath = rootDirectory,
                         selfInclude = true
                     )
                 )
@@ -108,12 +108,12 @@ class SampleActivity : ComponentActivity() {
                         onClick = { tree.expandRoot() }
                     )
                     TreeManagerButton(
-                        text = "Level 2",
-                        onClick = { tree.expandUntil(2) }
-                    )
-                    TreeManagerButton(
                         text = "Node",
                         onClick = { tree.expandNode(tree.firstBranchNodeAtLevel1) }
+                    )
+                    TreeManagerButton(
+                        text = "Level 2",
+                        onClick = { tree.expandUntil(2) }
                     )
                 }
             }
@@ -125,12 +125,12 @@ class SampleActivity : ComponentActivity() {
                         onClick = { tree.collapseRoot() }
                     )
                     TreeManagerButton(
-                        text = "Level 2",
-                        onClick = { tree.collapseFrom(2) }
-                    )
-                    TreeManagerButton(
                         text = "Node",
                         onClick = { tree.collapseNode(tree.firstBranchNodeAtLevel1) }
+                    )
+                    TreeManagerButton(
+                        text = "Level 2",
+                        onClick = { tree.collapseFrom(2) }
                     )
                 }
             }
@@ -138,12 +138,12 @@ class SampleActivity : ComponentActivity() {
             LazyRow {
                 item {
                     TreeManagerButton(
-                        text = "Clear",
-                        onClick = { tree.clearSelection() }
-                    )
-                    TreeManagerButton(
                         text = "Toggle",
                         onClick = { tree.toggleSelection(tree.nodes.first()) }
+                    )
+                    TreeManagerButton(
+                        text = "Clear",
+                        onClick = { tree.clearSelection() }
                     )
                 }
             }

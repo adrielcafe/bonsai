@@ -28,8 +28,8 @@ public interface BranchNode<T> : Node<T> {
         if (icon != null) {
             Image(
                 painter = icon,
-                contentDescription = name,
                 colorFilter = colorFilter,
+                contentDescription = name,
             )
         }
     }
@@ -44,16 +44,16 @@ public interface BranchNode<T> : Node<T> {
     }
 }
 
-public class SimpleBranchNode<T>(
+public open class SimpleBranchNode<T>(
     override val content: T,
     children: (BranchNode<T>) -> List<Node<T>>,
     override val name: String = content.toString(),
-    override val parent: Node<T>? = null,
+    final override val parent: Node<T>? = null,
     isSelected: Boolean = false,
     isExpanded: Boolean = false,
 ) : BranchNode<T> {
-    override val level: Int = parent?.level?.inc() ?: 0
-    override var isSelected: Boolean by mutableStateOf(isSelected)
-    override var isExpanded: Boolean by mutableStateOf(isExpanded)
-    override val children: MutableList<Node<T>> by lazy { children(this).toMutableStateList() }
+    final override val level: Int = parent?.level?.inc() ?: 0
+    final override var isSelected: Boolean by mutableStateOf(isSelected)
+    final override var isExpanded: Boolean by mutableStateOf(isExpanded)
+    final override val children: MutableList<Node<T>> by lazy { children(this).toMutableStateList() }
 }

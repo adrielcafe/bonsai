@@ -1,5 +1,6 @@
 package cafe.adriel.bonsai.core
 
+import androidx.annotation.FloatRange
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.expandVertically
@@ -52,7 +53,7 @@ public data class BonsaiStyle<T>(
     public val toggleIconSize: Dp = 16.dp,
     public val toggleIconColorFilter: ColorFilter? = null,
     public val toggleShape: Shape = CircleShape,
-    public val enableToggleIconRotation: Boolean = true,
+    @FloatRange(from = 0.0) public val toggleIconRotationDegrees: Float = 90f,
     public val nodeIconSize: Dp = 24.dp,
     public val nodePadding: PaddingValues = PaddingValues(all = 4.dp),
     public val nodeShape: Shape = RoundedCornerShape(size = 4.dp),

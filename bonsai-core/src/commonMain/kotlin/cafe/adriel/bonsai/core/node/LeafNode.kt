@@ -35,12 +35,12 @@ public interface LeafNode<T> : Node<T> {
     }
 }
 
-public class SimpleLeafNode<T>(
+public open class SimpleLeafNode<T>(
     override val content: T,
     override val name: String = content.toString(),
-    override val parent: Node<T>? = null,
+    final override val parent: Node<T>? = null,
     isSelected: Boolean = false
 ) : LeafNode<T> {
-    override val level: Int = parent?.level?.inc() ?: 0
-    override var isSelected: Boolean by mutableStateOf(isSelected)
+    final override val level: Int = parent?.level?.inc() ?: 0
+    final override var isSelected: Boolean by mutableStateOf(isSelected)
 }

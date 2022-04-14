@@ -17,13 +17,11 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import cafe.adriel.bonsai.core.BonsaiScope
 import cafe.adriel.bonsai.core.util.Saveable
 
@@ -77,7 +75,7 @@ private fun <T> BonsaiScope<T>.ToggleIcon(
 
     if (node is BranchNode) {
         val rotationDegrees by animateFloatAsState(
-            if (node.isExpanded && style.enableToggleIconRotation) 90f else 0f
+            if (node.isExpanded) style.toggleIconRotationDegrees else 0f
         )
 
         Image(
