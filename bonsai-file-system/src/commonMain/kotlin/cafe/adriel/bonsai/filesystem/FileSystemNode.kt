@@ -32,8 +32,8 @@ public fun FileSystemBonsaiStyle(): BonsaiStyle<Path> =
 
 public fun fileSystemNodes(
     rootPath: Path,
-    selfInclude: Boolean = false,
-    fileSystem: FileSystem = FileSystem.SYSTEM
+    fileSystem: FileSystem,
+    selfInclude: Boolean = false
 ): List<Node<Path>> =
     with(
         FileSystemNodeScope(

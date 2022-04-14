@@ -8,12 +8,11 @@
     <img height="80" src="https://user-images.githubusercontent.com/2512298/163075335-494c2a4d-e446-4627-8865-183683a75834.png"/>
     <br>
     Bonsai
-    <br>
 </h1>
 
 <h3  align="center">
     A batteries-included Tree View for Jetpack Compose
-    <br>
+    <br><br>
     <img width=400 src="https://user-images.githubusercontent.com/2512298/163289815-d584327c-ee5b-4f58-835c-121585b81f37.gif">
 </h3>
 
