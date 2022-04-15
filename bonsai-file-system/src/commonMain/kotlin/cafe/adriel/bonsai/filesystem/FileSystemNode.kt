@@ -55,15 +55,15 @@ private fun FileSystemNodeScope.fileSystemNodes(
     selfInclude: Boolean = false
 ): List<Node<Path>> =
     if (selfInclude) {
-        listOf(FileSystemNode(rootPath, parent))
+        listOf(fileSystemNode(rootPath, parent))
     } else {
         fileSystem
             .listOrNull(rootPath)
-            ?.map { path -> FileSystemNode(path, parent) }
+            ?.map { path -> fileSystemNode(path, parent) }
             .orEmpty()
     }
 
-private fun FileSystemNodeScope.FileSystemNode(
+private fun FileSystemNodeScope.fileSystemNode(
     path: Path,
     parent: Node<Path>?
 ) =

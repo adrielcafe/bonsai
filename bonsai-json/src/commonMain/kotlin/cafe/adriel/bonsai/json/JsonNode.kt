@@ -23,27 +23,27 @@ public fun JsonBonsaiStyle(): BonsaiStyle<JsonElement> =
 public fun jsonNodes(
     json: String
 ): List<Node<JsonElement>> =
-    jsonNodes(
-        key = "",
-        jsonElement = Json.Default.parseToJsonElement(json),
-        parent = null
+    listOf(
+        jsonNode(
+            key = "",
+            jsonElement = Json.Default.parseToJsonElement(json),
+            parent = null
+        )
     )
 
-private fun jsonNodes(
+private fun jsonNode(
     key: String,
     jsonElement: JsonElement,
     parent: Node<JsonElement>?
-): List<Node<JsonElement>> =
-    listOf(
-        when (jsonElement) {
-            is JsonNull -> JsonPrimitiveNode(key, jsonElement, parent)
-            is JsonPrimitive -> JsonPrimitiveNode(key, jsonElement, parent)
-            is JsonObject -> JsonObjectNode(key, jsonElement, parent)
-            is JsonArray -> JsonArrayNode(key, jsonElement, parent)
-        }
-    )
+): Node<JsonElement> =
+    when (jsonElement) {
+        is JsonNull -> jsonPrimitiveNode(key, jsonElement, parent)
+        is JsonPrimitive -> jsonPrimitiveNode(key, jsonElement, parent)
+        is JsonObject -> jsonObjectNode(key, jsonElement, parent)
+        is JsonArray -> jsonArrayNode(key, jsonElement, parent)
+    }
 
-private fun JsonPrimitiveNode(
+private fun jsonPrimitiveNode(
     key: String,
     jsonPrimitive: JsonPrimitive,
     parent: Node<JsonElement>?
@@ -54,7 +54,7 @@ private fun JsonPrimitiveNode(
         parent = parent
     )
 
-private fun JsonObjectNode(
+private fun jsonObjectNode(
     key: String,
     jsonObject: JsonObject,
     parent: Node<JsonElement>?
@@ -64,13 +64,13 @@ private fun JsonObjectNode(
         name = "${getFormattedKey(key)}{object}",
         parent = parent,
         children = { node ->
-            jsonObject.entries.flatMap { (name, jsonElement) ->
-                jsonNodes(name, jsonElement, node)
+            jsonObject.entries.map { (name, jsonElement) ->
+                jsonNode(name, jsonElement, node)
             }
         }
     )
 
-private fun JsonArrayNode(
+private fun jsonArrayNode(
     key: String,
     jsonArray: JsonArray,
     parent: Node<JsonElement>?
@@ -80,8 +80,8 @@ private fun JsonArrayNode(
         name = "${getFormattedKey(key)}[array]",
         parent = parent,
         children = { node ->
-            jsonArray.flatMapIndexed { index, jsonElement ->
-                jsonNodes(index.toString(), jsonElement, node)
+            jsonArray.mapIndexed { index, jsonElement ->
+                jsonNode(index.toString(), jsonElement, node)
             }
         }
     )
