@@ -14,8 +14,8 @@ android {
 dependencies {
     implementation(projects.bonsaiCore)
     implementation(projects.bonsaiFileSystem)
+    implementation(projects.bonsaiJson)
 
-    implementation libs.okio
     implementation libs.compose.activity
     implementation libs.compose.material
     implementation libs.compose.material.icons

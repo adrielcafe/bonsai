@@ -61,15 +61,14 @@ public data class BonsaiStyle<T>(
     public val nodeCollapsedColorFilter: ColorFilter? = null,
     public val nodeExpandedIcon: NodeIcon<T> = nodeCollapsedIcon,
     public val nodeExpandedColorFilter: ColorFilter? = nodeCollapsedColorFilter,
-    public val nodeNameStartPadding: Dp = 4.dp,
+    public val nodeNameStartPadding: Dp = 0.dp,
     public val nodeNameTextStyle: TextStyle = DefaultNodeTextStyle
 ) {
 
     public companion object {
         public val DefaultNodeTextStyle: TextStyle = TextStyle(
             fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
-            letterSpacing = 0.1.sp
+            fontSize = 12.sp
         )
     }
 }

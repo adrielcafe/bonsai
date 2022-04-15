@@ -5,6 +5,7 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.unit.dp
 import cafe.adriel.bonsai.core.BonsaiStyle
 import cafe.adriel.bonsai.core.node.BranchNode
 import cafe.adriel.bonsai.core.node.Node
@@ -19,6 +20,7 @@ internal data class FileSystemNodeScope(
 
 public fun FileSystemBonsaiStyle(): BonsaiStyle<Path> =
     BonsaiStyle(
+        nodeNameStartPadding = 4.dp,
         nodeCollapsedIcon = { node ->
             rememberVectorPainter(
                 if (node is BranchNode) Icons.Outlined.Folder

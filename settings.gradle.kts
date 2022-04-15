@@ -11,6 +11,7 @@ include(
     ":sample",
     ":bonsai-core",
     ":bonsai-file-system",
+    ":bonsai-json",
 )
 
 enableFeaturePreview("VERSION_CATALOGS")

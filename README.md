@@ -20,7 +20,8 @@
 - [x] Multiplatform: Android, Desktop
 - [x] State-aware: changes in the tree will trigger recomposition
 - [x] Unlimited levels
-- [x] [File system integration](#file-system)
+- [x] [File System integration](#file-system-integration)
+- [x] [JSON integration](#json-integration)
 - [x] [Built-in DSL](#dsl)
 - [x] [Expandable](#expanding--collapsing)
 - [x] [Selectable](#selecting)
@@ -65,10 +66,9 @@ Output:
 
 **Take a look at the [sample app](https://github.com/adrielcafe/bonsai/blob/main/sample/src/main/java/cafe/adriel/bonsai/sample/SampleActivity.kt) for a working example.**
 
-### File System
-Bonsai is integrated with file system, you should import `bonsai-file-system` module to use it.
+### File System integration
+Import `cafe.adriel.bonsai:bonsai-file-system` module to use it.
 
-Instead of manually create the nodes, call `fileSystemNodes()` to generate for you based on a root path.
 ```kotlin
 val tree = rememberTree<Path>(
     nodes = fileSystemNodes(
@@ -81,7 +81,7 @@ val tree = rememberTree<Path>(
 
 Bonsai(
     tree = tree,
-    // Custom style to show file and directory icons
+    // Custom style
     style = FileSystemBonsaiStyle()
 )
 ```
@@ -89,6 +89,26 @@ Bonsai(
 Output:
 
 <img width=300 src="https://user-images.githubusercontent.com/2512298/163184371-a5a38003-44d9-4daa-8f41-6ee3914611f1.png">
+
+### JSON integration
+Import `cafe.adriel.bonsai:bonsai-json` module to use it.
+
+```kotlin
+val tree = rememberTree<Path>(
+    // Sample JSON from https://rickandmortyapi.com/api/character
+    nodes = jsonNodes(json)
+)
+
+Bonsai(
+    tree = tree,
+    // Custom style
+    style = JsonBonsaiStyle()
+)
+```
+
+Output:
+
+<img width=350 src="https://user-images.githubusercontent.com/2512298/163498419-f555d3df-e75d-4e88-9d87-7f29b14e1214.png">
 
 ### DSL
 Looking for a simpler and less verbose way to create a tree? Here's a handy DSL for you.
@@ -210,6 +230,7 @@ Add the desired dependencies to your module's `build.gradle`:
 ```gradle
 implementation "cafe.adriel.bonsai:bonsai-core:${latest-version}"
 implementation "cafe.adriel.bonsai:bonsai-file-system:${latest-version}"
+implementation "cafe.adriel.bonsai:bonsai-json:${latest-version}"
 ```
 
 Current version: ![Maven metadata URL](https://img.shields.io/maven-metadata/v?color=blue&metadataUrl=https://s01.oss.sonatype.org/service/local/repo_groups/public/content/cafe/adriel/bonsai/bonsai-core/maven-metadata.xml)
