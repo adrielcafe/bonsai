@@ -4,19 +4,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.InsertDriveFile
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import cafe.adriel.bonsai.core.BonsaiStyle
+import cafe.adriel.bonsai.core.node.Branch
 import cafe.adriel.bonsai.core.node.BranchNode
-import cafe.adriel.bonsai.core.node.Node
-import cafe.adriel.bonsai.core.node.SimpleBranchNode
-import cafe.adriel.bonsai.core.node.SimpleLeafNode
+import cafe.adriel.bonsai.core.node.Leaf
+import cafe.adriel.bonsai.core.tree.Tree
+import cafe.adriel.bonsai.core.tree.TreeScope
 import okio.FileSystem
 import okio.Path
-
-internal data class FileSystemNodeScope(
-    val fileSystem: FileSystem
-)
 
 public fun FileSystemBonsaiStyle(): BonsaiStyle<Path> =
     BonsaiStyle(
@@ -32,52 +30,51 @@ public fun FileSystemBonsaiStyle(): BonsaiStyle<Path> =
         }
     )
 
-public fun fileSystemNodes(
+@Composable
+public fun FileSystemTree(
     rootPath: Path,
     fileSystem: FileSystem,
     selfInclude: Boolean = false
-): List<Node<Path>> =
-    with(
-        FileSystemNodeScope(
-            fileSystem = fileSystem
-        )
-    ) {
-        fileSystemNodes(
+): Tree<Path> =
+    Tree {
+        FileSystemTree(
             rootPath = rootPath,
-            parent = null,
-            selfInclude = selfInclude,
+            fileSystem = fileSystem,
+            selfInclude = selfInclude
         )
     }
 
-private fun FileSystemNodeScope.fileSystemNodes(
+@Composable
+private fun TreeScope.FileSystemTree(
     rootPath: Path,
-    parent: Node<Path>?,
+    fileSystem: FileSystem,
     selfInclude: Boolean = false
-): List<Node<Path>> =
+) {
     if (selfInclude) {
-        listOf(fileSystemNode(rootPath, parent))
+        FileSystemNode(rootPath, fileSystem)
     } else {
         fileSystem
             .listOrNull(rootPath)
-            ?.map { path -> fileSystemNode(path, parent) }
-            .orEmpty()
+            ?.forEach { path -> FileSystemNode(path, fileSystem) }
     }
+}
 
-private fun FileSystemNodeScope.fileSystemNode(
+@Composable
+private fun TreeScope.FileSystemNode(
     path: Path,
-    parent: Node<Path>?
-) =
+    fileSystem: FileSystem
+) {
     if (fileSystem.metadata(path).isDirectory) {
-        SimpleBranchNode(
+        Branch(
             content = path,
-            name = path.name,
-            parent = parent,
-            children = { node -> fileSystemNodes(path, node) }
-        )
+            name = path.name
+        ) {
+            FileSystemTree(path, fileSystem)
+        }
     } else {
-        SimpleLeafNode(
+        Leaf(
             content = path,
-            name = path.name,
-            parent = parent
+            name = path.name
         )
     }
+}

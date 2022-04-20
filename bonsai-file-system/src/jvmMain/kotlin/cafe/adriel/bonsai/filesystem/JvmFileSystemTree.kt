@@ -1,27 +1,30 @@
 package cafe.adriel.bonsai.filesystem
 
-import cafe.adriel.bonsai.core.node.Node
+import androidx.compose.runtime.Composable
+import cafe.adriel.bonsai.core.tree.Tree
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import java.io.File
 import java.nio.file.Path as NioPath
 
-public fun fileSystemNodes(
+@Composable
+public fun FileSystemTree(
     rootPath: File,
     selfInclude: Boolean = false
-): List<Node<Path>> =
-    fileSystemNodes(
+): Tree<Path> =
+    FileSystemTree(
         rootPath = rootPath.toOkioPath(),
         fileSystem = FileSystem.SYSTEM,
         selfInclude = selfInclude
     )
 
-public fun fileSystemNodes(
+@Composable
+public fun FileSystemTree(
     rootPath: NioPath,
     selfInclude: Boolean = false
-): List<Node<Path>> =
-    fileSystemNodes(
+): Tree<Path> =
+    FileSystemTree(
         rootPath = rootPath.toOkioPath(),
         fileSystem = FileSystem.SYSTEM,
         selfInclude = selfInclude
