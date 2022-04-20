@@ -16,7 +16,8 @@ dependencies {
     implementation(projects.bonsaiFileSystem)
     implementation(projects.bonsaiJson)
 
-    implementation libs.compose.activity
     implementation libs.compose.material
     implementation libs.compose.material.icons
+    implementation libs.compose.activity
+    implementation libs.compose.voyager
 }

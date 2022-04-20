@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.bonsai.core.node.Node
-import cafe.adriel.bonsai.core.tree.extension.ExpandableTree
 import cafe.adriel.bonsai.core.tree.Tree
+import cafe.adriel.bonsai.core.tree.extension.ExpandableTree
 import cafe.adriel.bonsai.core.tree.extension.SelectableTree
 
 public typealias OnNodeClick<T> = ((Node<T>) -> Unit)?
