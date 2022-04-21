@@ -31,7 +31,7 @@ object FileSystemTreeScreen : TreeScreen<Path> {
     override val title = "File System Tree"
 
     @Composable
-    override fun buildTree(): Tree<Path> {
+    override fun composeTree(): Tree<Path> {
         val context = LocalContext.current
         val rootDirectory = remember {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) context.dataDir

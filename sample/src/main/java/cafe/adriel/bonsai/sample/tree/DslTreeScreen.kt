@@ -15,7 +15,7 @@ object DslTreeScreen : TreeScreen<String> {
     override val title = "DSL Tree"
 
     @Composable
-    override fun buildTree(): Tree<String> =
+    override fun composeTree(): Tree<String> =
         Tree {
             Branch("Animalia") {
                 Branch("Chordata") {
@@ -23,16 +23,16 @@ object DslTreeScreen : TreeScreen<String> {
                         Branch("Carnivora") {
                             Branch("Canidae") {
                                 Branch("Canis") {
-                                    Leaf("Wolf", customIcon = { LeafIcon("\uD83D\uDC3A") })
-                                    Leaf("Dog", customIcon = { LeafIcon("\uD83D\uDC36") })
+                                    Leaf("Wolf", customIcon = { EmojiIcon("\uD83D\uDC3A") })
+                                    Leaf("Dog", customIcon = { EmojiIcon("\uD83D\uDC36") })
                                 }
                             }
                             Branch("Felidae") {
                                 Branch("Felis") {
-                                    Leaf("Cat", customIcon = { LeafIcon("\uD83D\uDC31") })
+                                    Leaf("Cat", customIcon = { EmojiIcon("\uD83D\uDC31") })
                                 }
                                 Branch("Panthera") {
-                                    Leaf("Lion", customIcon = { LeafIcon("\uD83E\uDD81") })
+                                    Leaf("Lion", customIcon = { EmojiIcon("\uD83E\uDD81") })
                                 }
                             }
                         }
@@ -43,12 +43,12 @@ object DslTreeScreen : TreeScreen<String> {
                 Branch("Solanales") {
                     Branch("Convolvulaceae") {
                         Branch("Ipomoea") {
-                            Leaf("Sweet Potato", customIcon = { LeafIcon("\uD83C\uDF60") })
+                            Leaf("Sweet Potato", customIcon = { EmojiIcon("\uD83C\uDF60") })
                         }
                     }
                     Branch("Solanaceae") {
-                        Leaf("Potato", customIcon = { LeafIcon("\uD83E\uDD54") })
-                        Leaf("Tomato", customIcon = { LeafIcon("\uD83C\uDF45") })
+                        Leaf("Potato", customIcon = { EmojiIcon("\uD83E\uDD54") })
+                        Leaf("Tomato", customIcon = { EmojiIcon("\uD83C\uDF45") })
                     }
                 }
             }
@@ -69,7 +69,7 @@ object DslTreeScreen : TreeScreen<String> {
     }
 
     @Composable
-    private fun LeafIcon(emoji: String) {
+    private fun EmojiIcon(emoji: String) {
         Text(emoji)
     }
 }

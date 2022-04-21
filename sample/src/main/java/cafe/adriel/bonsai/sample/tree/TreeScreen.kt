@@ -34,7 +34,7 @@ interface TreeScreen<T> : Screen {
 
     @Composable
     override fun Content() {
-        val tree = buildTree()
+        val tree = composeTree()
 
         Column(
             verticalArrangement = Arrangement.Bottom,
@@ -52,7 +52,7 @@ interface TreeScreen<T> : Screen {
     }
 
     @Composable
-    fun buildTree(): Tree<T>
+    fun composeTree(): Tree<T>
 
     @Composable
     fun BonsaiContent(

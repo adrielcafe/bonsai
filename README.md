@@ -19,10 +19,12 @@
 #### Features
 - [x] Multiplatform: Android, Desktop
 - [x] State-aware: changes in the tree will trigger recomposition
-- [x] Unlimited levels
+- [x] Unlimited depth
+- [x] Lazy loaded nodes
+- [x] Survives activity recreation
+- [x] [Built-in DSL](#usage)
 - [x] [File System integration](#file-system-integration)
 - [x] [JSON integration](#json-integration)
-- [x] [Built-in DSL](#dsl)
 - [x] [Expandable](#expanding--collapsing)
 - [x] [Selectable](#selecting)
 - [x] [Clickable](#click-handling)
@@ -31,30 +33,47 @@
 
 #### Roadmap
 - iOS support
+- Draggable nodes
+- FileObserver (Android) and/or WatchService (JVM) integration
+
+## Import to your project
+Add the desired dependencies to your module's `build.gradle`:
+```gradle
+implementation "cafe.adriel.bonsai:bonsai-core:${latest-version}"
+implementation "cafe.adriel.bonsai:bonsai-file-system:${latest-version}"
+implementation "cafe.adriel.bonsai:bonsai-json:${latest-version}"
+```
+
+Current version: ![Maven metadata URL](https://img.shields.io/maven-metadata/v?color=blue&metadataUrl=https://s01.oss.sonatype.org/service/local/repo_groups/public/content/cafe/adriel/bonsai/bonsai-core/maven-metadata.xml)
 
 ## Usage
-Start by creating a new tree with `rememberTree<T>()`. Use `SimpleLeafNode<T>` and `SimpleBranchNode<T>` to create leaf and branch nodes, respectively. Call the `Bonsai()` composable to render the tree.
+Bonsai comes with a handy DSL for creating high-performance, customizable trees:
+1. Start by creating a new tree with `Tree<T>{}`
+2. Create nodes with `Leaf<T>()` and `Branch<T>()`
+3. Call `Bonsai()` to render the tree
 ```kotlin
 @Composable
 fun BonsaiExample() {
-    val tree = rememberTree(
-        nodes = listOf(
-            SimpleLeafNode(
-                content = "A leaf node"
-            ),
-            SimpleBranchNode(
-                content = "A branch node",
-                children = { node ->
-                    listOf(
-                        SimpleLeafNode(
-                            content = "A child node",
-                            parent = node
-                        ),
-                    )
+    val tree = Tree {
+        Branch("Mammalia") {
+            Branch("Carnivora") {
+                Branch("Canidae") {
+                    Branch("Canis") {
+                        Leaf("Wolf", customIcon = { EmojiIcon("🐺") })
+                        Leaf("Dog", customIcon = { EmojiIcon("🐶") })
+                    }
                 }
-            )
-        )
-    )
+                Branch("Felidae") {
+                    Branch("Felis") {
+                        Leaf("Cat", customIcon = { EmojiIcon("🐱") })
+                    }
+                    Branch("Panthera") {
+                        Leaf("Lion", customIcon = { EmojiIcon("🦁") })
+                    }
+                }
+            }
+        }
+    }
 
     Bonsai(tree)
 }
@@ -62,21 +81,19 @@ fun BonsaiExample() {
 
 Output:
 
-<img width=150 src="https://user-images.githubusercontent.com/2512298/163285446-df635cf7-c43c-494a-be0e-a4673c7ee0eb.png">
+<img width=200 src="https://user-images.githubusercontent.com/2512298/164339464-2fc48395-8b52-414d-93d0-b4829dcc5c76.png">
 
-**Take a look at the [sample app](https://github.com/adrielcafe/bonsai/blob/main/sample/src/main/java/cafe/adriel/bonsai/sample/SampleActivity.kt) for a working example.**
+**Take a look at the [sample app](https://github.com/adrielcafe/bonsai/blob/main/sample/src/main/java/cafe/adriel/bonsai/sample/) for working examples.**
 
 ### File System integration
 Import `cafe.adriel.bonsai:bonsai-file-system` module to use it.
 
 ```kotlin
-val tree = rememberTree<Path>(
-    nodes = fileSystemNodes(
-        // Also works with java.nio.file.Path and okio.Path
-        rootPath = File(path), 
-        // To show or not the root directory in the tree
-        selfInclude = true 
-    )
+val tree = FileSystemTree(
+    // Also works with java.nio.file.Path and okio.Path
+    rootPath = File(path),
+    // To show or not the root directory in the tree
+    selfInclude = true
 )
 
 Bonsai(
@@ -88,15 +105,15 @@ Bonsai(
 
 Output:
 
-<img width=300 src="https://user-images.githubusercontent.com/2512298/163184371-a5a38003-44d9-4daa-8f41-6ee3914611f1.png">
+<img width=350 src="https://user-images.githubusercontent.com/2512298/164344584-d17d3131-6515-4d76-b7c1-017e33731c6f.png">
 
 ### JSON integration
 Import `cafe.adriel.bonsai:bonsai-json` module to use it.
 
 ```kotlin
-val tree = rememberTree<Path>(
-    // Sample JSON from https://rickandmortyapi.com/api/character
-    nodes = jsonNodes(json)
+val tree = JsonTree(
+    // Sample JSON from https://gateway.marvel.com/v1/public/characters
+    json = responseJson
 )
 
 Bonsai(
@@ -108,47 +125,19 @@ Bonsai(
 
 Output:
 
-<img width=350 src="https://user-images.githubusercontent.com/2512298/163498419-f555d3df-e75d-4e88-9d87-7f29b14e1214.png">
-
-### DSL
-Looking for a simpler and less verbose way to create a tree? Here's a handy DSL for you.
-```kotlin
-val tree = Tree<String> {
-    Branch("bonsai") {
-        Branch("bonsai-core") {
-            Branch("build")
-            Branch("src") {
-                Branch("androidMain") {
-                    Leaf("AndroidManifest.xml")
-                }
-                Branch("commonMain")
-            }
-            Leaf("build.gradle")
-        }
-        Branch("bonsai-file-system")
-        Branch("sample")
-        Leaf(".gitignore")
-        Leaf("build.gradle")
-        Leaf("README.md")
-    }
-}
-```
-
-Output:
-
-<img width=300 src="https://user-images.githubusercontent.com/2512298/163077920-a9c29430-544a-4ab3-94f8-250a6028638d.png">
+<img width=400 src="https://user-images.githubusercontent.com/2512298/164342551-b5f869eb-a2fd-414c-b856-916601e2785e.png"> <img width=400 src="https://user-images.githubusercontent.com/2512298/164344465-6a0fb267-cd26-458c-a67b-db18d6a45d03.png">
 
 ### Expanding & Collapsing
-Easy control the expanded/collapsed state of your `Tree`: 
+Easily control the expanded/collapsed state of your `Tree`: 
 * `toggleExpansion(node)`
-* `collapseAll()` / `expandAll()`
 * `collapseRoot()` / `expandRoot()`
-* `collapseFrom(minLevel)` / `expandUntil(maxLevel)`
+* `collapseAll()` / `expandAll()`
+* `collapseFrom(depth)` / `expandUntil(depth)`
 * `collapseNode(node)` / `expandNode(node)`
 
 ### Selecting
 Selected/Unselected state is also pretty simple to control: 
-* `selectedNodes` (observable state backed by `SnapshotStateList`)
+* `selectedNodes`
 * `toggleSelection(node)`
 * `selectNode(node)` / `unselectNode(node)`
 * `clearSelection()`
@@ -173,8 +162,6 @@ Change your `Tree` appearance as you wish. Take a look at `BonsaiStyle` class fo
 Bonsai(
     tree = tree,
     style = BonsaiStyle(
-        expandTransition = slideIn(),
-        collapseTransition = slideOut(),
         toggleIconRotationDegrees = 0f,
         toggleIcon = { node ->
             rememberVectorPainter(
@@ -193,44 +180,17 @@ Bonsai(
 
 Output:
 
-<img width=300 src="https://user-images.githubusercontent.com/2512298/163079810-dfa5b4be-9111-4de1-a3eb-81bf8440963a.png">
+<img width=250 src="https://user-images.githubusercontent.com/2512298/164343259-0df574f6-e602-4bb1-93e2-c263fb1ee1ed.png">
 
 ### Custom nodes
-Need a deeper customization? Just extend the `SimpleLeafNode` and `SimpleBranchNode` classes, or even the `Node` interface, to fit your needs.
+Need a deeper customization? You can set `customIcon`s and `customName`s for each `Leaf<T>()` and `Branch<T>()` nodes.
 ```kotlin
-class CustomLeafNode : SimpleLeafNode<CustomClass>(/* setup */) {
-
-    @Composable
-    override fun BonsaiScope<T>.NodeIcon() {
-        // Custom leaf node icon
-    }
-
-    @Composable
-    override fun BonsaiScope<T>.NodeName() {
-        // Custom leaf node name
-    }
-}
-
-class CustomBranchNode : SimpleBranchNode<CustomClass>(/* setup */) {
-
-    @Composable
-    override fun BonsaiScope<T>.NodeIcon() {
-        // Custom branch node icon
-    }
-
-    @Composable
-    override fun BonsaiScope<T>.NodeName() {
-        // Custom branch node name
-    }
-}
+Leaf(
+    content = "Wolf", 
+    customIcon = { EmojiIcon("🐺") }
+)
 ```
 
-## Import to your project
-Add the desired dependencies to your module's `build.gradle`:
-```gradle
-implementation "cafe.adriel.bonsai:bonsai-core:${latest-version}"
-implementation "cafe.adriel.bonsai:bonsai-file-system:${latest-version}"
-implementation "cafe.adriel.bonsai:bonsai-json:${latest-version}"
-```
+Output:
 
-Current version: ![Maven metadata URL](https://img.shields.io/maven-metadata/v?color=blue&metadataUrl=https://s01.oss.sonatype.org/service/local/repo_groups/public/content/cafe/adriel/bonsai/bonsai-core/maven-metadata.xml)
+<img width=200 src="https://user-images.githubusercontent.com/2512298/164343479-fd6d2ce0-4335-48ac-90a0-0a93c2c57649.png">

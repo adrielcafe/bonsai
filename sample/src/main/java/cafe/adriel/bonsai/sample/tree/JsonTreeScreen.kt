@@ -17,7 +17,7 @@ object JsonTreeScreen : TreeScreen<JsonElement> {
     override val title = "JSON Tree"
 
     @Composable
-    override fun buildTree(): Tree<JsonElement> {
+    override fun composeTree(): Tree<JsonElement> {
         val context = LocalContext.current
         val json = context
             .resources
