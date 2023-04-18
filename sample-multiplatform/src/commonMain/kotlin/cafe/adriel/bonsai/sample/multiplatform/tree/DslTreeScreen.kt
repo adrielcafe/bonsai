@@ -1,4 +1,4 @@
-package cafe.adriel.bonsai.sample.tree
+package cafe.adriel.bonsai.sample.multiplatform.tree
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable

@@ -17,5 +17,11 @@ kotlin {
                 compileOnly(compose.materialIconsExtended)
             }
         }
+
+        val jsMain by getting {
+            dependencies {
+                implementation(libs.multiplatformUuid)
+            }
+        }
     }
 }

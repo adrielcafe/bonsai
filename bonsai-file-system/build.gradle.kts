@@ -5,7 +5,9 @@ plugins {
     id("com.vanniktech.maven.publish")
 }
 
-kotlinMultiplatform()
+kotlinMultiplatform(
+    disableIos = true // okio js is focus based NodeJS.
+)
 
 kotlin {
     sourceSets {

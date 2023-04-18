@@ -16,6 +16,7 @@ kotlin {
                 api(libs.serialization)
                 compileOnly(compose.foundation)
                 compileOnly(compose.ui)
+                compileOnly(compose.materialIconsExtended)
             }
         }
     }

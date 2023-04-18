@@ -1,4 +1,4 @@
-package cafe.adriel.bonsai.sample
+package cafe.adriel.bonsai.sample.multiplatform
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import cafe.adriel.bonsai.sample.tree.DslTreeScreen
-import cafe.adriel.bonsai.sample.tree.FileSystemTreeScreen
-import cafe.adriel.bonsai.sample.tree.JsonTreeScreen
+import cafe.adriel.bonsai.sample.multiplatform.tree.DslTreeScreen
+import cafe.adriel.bonsai.sample.multiplatform.tree.JsonTreeScreen
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -28,10 +28,13 @@ object HomeScreen : Screen {
                 text = "DSL Tree",
                 screen = DslTreeScreen
             )
-            SampleButton(
-                text = "File System Tree",
-                screen = FileSystemTreeScreen
-            )
+            val fileSystemTreeScreen = remember { FileSystemTreeScreenOrNull() }
+            if(fileSystemTreeScreen != null) {
+                SampleButton(
+                    text = "File System Tree",
+                    screen = fileSystemTreeScreen
+                )
+            }
             SampleButton(
                 text = "JSON Tree",
                 screen = JsonTreeScreen

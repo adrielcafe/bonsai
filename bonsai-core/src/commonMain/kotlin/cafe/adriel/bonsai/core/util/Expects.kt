@@ -1,3 +1,3 @@
 package cafe.adriel.bonsai.core.util
 
-internal expect val randomUUID: String
+internal expect fun randomUUID(): String

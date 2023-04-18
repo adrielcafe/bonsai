@@ -1,6 +1,5 @@
-package cafe.adriel.bonsai.sample.tree
+package cafe.adriel.bonsai.sample.multiplatform.tree
 
-import android.os.Build
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Adb
 import androidx.compose.material.icons.outlined.Android
@@ -18,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.bonsai.core.Bonsai
 import cafe.adriel.bonsai.core.node.BranchNode
 import cafe.adriel.bonsai.core.tree.Tree
@@ -32,13 +30,10 @@ object FileSystemTreeScreen : TreeScreen<Path> {
 
     @Composable
     override fun composeTree(): Tree<Path> {
-        val context = LocalContext.current
-        val rootDirectory = remember {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) context.dataDir
-            else context.codeCacheDir
-        }
+        val rootDirectory = rootDirectoryPath()
+        val fileSystem = fileSystem()
 
-        return FileSystemTree(rootDirectory, selfInclude = true)
+        return FileSystemTree(rootDirectory, fileSystem, selfInclude = true)
     }
 
     @Composable
@@ -67,7 +62,7 @@ object FileSystemTreeScreen : TreeScreen<Path> {
     @Composable
     private fun getIcon(path: Path, default: ImageVector) =
         rememberVectorPainter(
-            when (path.toFile().extension) {
+            when (path.name.substringAfterLast(".")) {
                 "apk" -> Icons.Outlined.Android
                 "jar" -> Icons.Outlined.LocalCafe
                 "studio" -> Icons.Outlined.Adb

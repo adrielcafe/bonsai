@@ -13,17 +13,8 @@ buildscript {
 subprojects {
     apply plugin: 'org.jlleitschuh.gradle.ktlint'
     apply plugin: 'io.gitlab.arturbosch.detekt'
-    plugins.withId("com.vanniktech.maven.publish") {
-        mavenPublish {
-            sonatypeHost = "S01"
-        }
-    }
     detekt {
         config = files("../detekt.yml")
         parallel = true
     }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }
