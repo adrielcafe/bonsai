@@ -77,6 +77,27 @@ public fun <T> Bonsai(
     onLongClick: OnNodeClick<T> = tree::toggleSelection,
     style: BonsaiStyle<T> = BonsaiStyle(),
 ) {
+    Bonsai(
+        tree = tree,
+        content = {
+            DefaultBonsaiTreeNodes(tree, modifier)
+        },
+        onClick = onClick,
+        onDoubleClick = onDoubleClick,
+        onLongClick = onLongClick,
+        style = style,
+    )
+}
+
+@Composable
+public fun <T> Bonsai(
+    tree: Tree<T>,
+    content: @Composable BonsaiScope<T>.() -> Unit,
+    onClick: OnNodeClick<T> = tree::onNodeClick,
+    onDoubleClick: OnNodeClick<T> = tree::onNodeClick,
+    onLongClick: OnNodeClick<T> = tree::toggleSelection,
+    style: BonsaiStyle<T> = BonsaiStyle(),
+) {
     val scope = remember(tree) {
         BonsaiScope(
             expandableManager = tree,
@@ -88,15 +109,18 @@ public fun <T> Bonsai(
         )
     }
 
-    with(scope) {
-        LazyColumn(
-            modifier = modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-        ) {
-            items(tree.nodes, { it.key }) { node ->
-                Node(node)
-            }
+    content(scope)
+}
+
+@Composable
+public fun <T> BonsaiScope<T>.DefaultBonsaiTreeNodes(tree: Tree<T>, modifier: Modifier = Modifier) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+    ) {
+        items(tree.nodes, { node -> node.key }) { node ->
+            Node(node)
         }
     }
 }
