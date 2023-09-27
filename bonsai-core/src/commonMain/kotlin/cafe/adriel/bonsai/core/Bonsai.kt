@@ -80,7 +80,7 @@ public fun <T> Bonsai(
     Bonsai(
         tree = tree,
         content = {
-            DefaultBonsaiTreeNodes(tree, modifier)
+            BonsaiVerticalTreeNodes(tree, modifier)
         },
         onClick = onClick,
         onDoubleClick = onDoubleClick,
@@ -113,7 +113,7 @@ public fun <T> Bonsai(
 }
 
 @Composable
-public fun <T> BonsaiScope<T>.DefaultBonsaiTreeNodes(tree: Tree<T>, modifier: Modifier = Modifier) {
+public fun <T> BonsaiVerticalTreeNodes(tree: Tree<T>, modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
