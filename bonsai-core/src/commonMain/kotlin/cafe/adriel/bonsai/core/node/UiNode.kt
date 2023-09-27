@@ -24,12 +24,13 @@ import androidx.compose.ui.unit.times
 import cafe.adriel.bonsai.core.BonsaiScope
 
 @Composable
-internal fun <T> BonsaiScope<T>.Node(
-    node: Node<T>
+public fun <T> BonsaiScope<T>.Node(
+    node: Node<T>,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 1.dp)
             .padding(start = node.depth * style.toggleIconSize)
     ) {
