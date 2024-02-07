@@ -92,7 +92,9 @@ private fun <T> BonsaiScope<T>.NodeContent(
 private fun <T> BonsaiScope<T>.clickableNode(
     node: Node<T>
 ): Modifier =
-    if (onLongClick == null && onDoubleClick == null) {
+    if (onClick == null && onLongClick == null && onDoubleClick == null) {
+        Modifier // no click action, return a noop modifier
+    } else if (onLongClick == null && onDoubleClick == null) {
         Modifier.clickable { onClick?.invoke(node) }
     } else {
         Modifier.combinedClickable(
