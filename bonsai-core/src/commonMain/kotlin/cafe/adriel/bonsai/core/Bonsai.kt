@@ -4,7 +4,9 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -77,6 +79,7 @@ public fun <T> Bonsai(
     onDoubleClick: OnNodeClick<T> = tree::onNodeClick,
     onLongClick: OnNodeClick<T> = tree::toggleSelection,
     style: BonsaiStyle<T> = BonsaiStyle(),
+    listState: LazyListState = rememberLazyListState(),
 ) {
     val scope = remember(tree) {
         BonsaiScope(
@@ -91,6 +94,7 @@ public fun <T> Bonsai(
 
     with(scope) {
         LazyColumn(
+            state = listState,
             modifier = modifier
                 .fillMaxWidth()
                 .run {
