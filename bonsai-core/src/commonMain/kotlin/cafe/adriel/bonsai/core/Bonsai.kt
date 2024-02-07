@@ -59,7 +59,8 @@ public data class BonsaiStyle<T>(
     public val nodeExpandedIcon: NodeIcon<T> = nodeCollapsedIcon,
     public val nodeExpandedIconColorFilter: ColorFilter? = nodeCollapsedIconColorFilter,
     public val nodeNameStartPadding: Dp = 0.dp,
-    public val nodeNameTextStyle: TextStyle = DefaultNodeTextStyle
+    public val nodeNameTextStyle: TextStyle = DefaultNodeTextStyle,
+    public val useHorizontalScroll : Boolean = true
 ) {
 
     public companion object {
@@ -93,10 +94,15 @@ public fun <T> Bonsai(
 
     with(scope) {
         LazyColumn(
+            state = listState,
             modifier = modifier
                 .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            state = listState,
+                .run {
+                    if (style.useHorizontalScroll)
+                        horizontalScroll(rememberScrollState())
+                    else
+                        this
+                }
         ) {
             items(tree.nodes, { it.key }) { node ->
                 Node(node)
