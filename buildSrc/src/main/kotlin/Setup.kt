@@ -25,6 +25,8 @@ fun Project.kotlinMultiplatform(
             publishAllLibraryVariants()
         }
         jvm("desktop")
+        ios()
+        iosSimulatorArm64()
 
         sourceSets {
             /* Source sets structure
@@ -55,6 +57,13 @@ fun Project.kotlinMultiplatform(
             }
             val desktopTest by getting {
                 dependsOn(jvmTest)
+            }
+
+            val iosMain by getting {
+                dependsOn(commonMain)
+            }
+            val iosSimulatorArm64Main by getting {
+                dependsOn(iosMain)
             }
         }
     }
